@@ -1,12 +1,40 @@
-<h2>Enter Location:</h2>
+<head>
+  <script src="http://ol3js.org/en/master/build/ol.js"></script>
+  <!-- Include this version to improve your development/debugging experience
+  <script src="http://ol3js.org/en/master/build/ol-debug.js"></script>
+  -->
+  <link rel="stylesheet" href="http://ol3js.org/en/master/css/ol.css" />
+</head>
+
+<h3>Start Location:</h3>
+<div class="map" id="startMap"></div>
 <div>
     <label>Latitude:
-      <input [(ngModel)]="latitude" placeholder="latitude">
+      <input [(ngModel)]="startLatitude" placeholder="latitude">
     </label>
 </div>
 <div>
     <label>Longitude:
-      <input [(ngModel)]="longitude" placeholder="longitude">
+      <input [(ngModel)]="startLongitude" placeholder="longitude">
     </label>
 </div>
-<p><button (click)="submit()">Click Me</button></p>
+
+<h3>End Location:</h3>
+
+<div class="map" id="endMap"></div>
+<div>
+    <label>Latitude:
+      <input [(ngModel)]="endLatitude" placeholder="latitude">
+    </label>
+</div>
+<div>
+    <label>Longitude:
+      <input [(ngModel)]="endLongitude" placeholder="longitude">
+    </label>
+</div>
+
+<app-options></app-options>
+
+<p>
+  <button (click)="submit()">Start</button>
+</p>

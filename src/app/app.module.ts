@@ -6,6 +6,7 @@ import { FormsModule } from '@angular/forms';
 
 import { AppComponent } from './app.component';
 import { LocationsComponent } from './locations/locations.component';
+import { OptionsComponent } from './options/options.component';
 
 import { LocationService } from './services/location.service';
 
@@ -13,7 +14,8 @@ import { LocationService } from './services/location.service';
 @NgModule({
   declarations: [
     AppComponent,
-    LocationsComponent
+    LocationsComponent,
+    OptionsComponent
   ],
   imports: [
     BrowserModule,
