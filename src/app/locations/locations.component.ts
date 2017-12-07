@@ -80,7 +80,7 @@ export class LocationsComponent implements OnInit {
             endVectorLayer
           ],
           view: new ol.View({
-            center: ol.proj.fromLonLat([-72.49, 42.25]);//ol.proj.transform([-432.559, 42.36], 'EPSG:4326', 'EPSG:3857'),
+            center: ol.proj.fromLonLat([-72.49, 42.25]),//ol.proj.transform([-432.559, 42.36], 'EPSG:4326', 'EPSG:3857'),
             zoom: 9
           })
     });
