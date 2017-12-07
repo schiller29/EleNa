@@ -4,7 +4,7 @@ import { LocationService } from '../services/location.service';
 import { Options } from '../models/options';
 
 //probably can condense this
-import SourceVector from '../../../node_modules/ol/source/vector';
+/*import SourceVector from '../../../node_modules/ol/source/vector';
 import LayerVector from '../../../node_modules/ol/layer/vector';
 import Text from '../../../node_modules/ol/style/text';
 import Fill from '../../../node_modules/ol/style/fill';
@@ -17,7 +17,8 @@ import View from '../../../node_modules/ol/view';
 import TileLayer from '../../../node_modules/ol/layer/tile';
 import XYZ from '../../../node_modules/ol/source/xyz';
 import Point from '../../../node_modules/ol/geom/point';
-import Feature from '../../../node_modules/ol/feature';
+import Feature from '../../../node_modules/ol/feature';*/
+declare var ol: any;
 
 @Component({
   selector: 'app-locations',
@@ -57,69 +58,69 @@ export class LocationsComponent implements OnInit {
 
   ngOnInit() {
 
-    var startVectorSource = new SourceVector();
-    var startVectorLayer = new LayerVector({
+    var startVectorSource = new ol.source.Vector();
+    var startVectorLayer = new ol.layer.Vector({
       source: startVectorSource
     });
 
-    var endVectorSource = new SourceVector();
-    var endVectorLayer = new LayerVector({
+    var endVectorSource = new ol.source.Vector();
+    var endVectorLayer = new ol.layer.Vector({
       source: endVectorSource
     });
 
-    var startMap = new Map({
+    var startMap = new ol.Map({
       target: 'startMap',
       layers: [
-        new TileLayer({
-          source: new XYZ({
+        new ol.layer.Tile({
+          source: new ol.source.XYZ({
             url: 'https://{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png'
           })
         }),
         startVectorLayer
       ],
-      view: new View({
-        center: Proj.transform([-432.559, 42.36], 'EPSG:4326', 'EPSG:3857'),
+      view: new ol.View({
+        center: ol.proj.transform([-432.559, 42.36], 'EPSG:4326', 'EPSG:3857'),
         zoom: 9
       })
     });
-    var endMap = new Map({
+    var endMap = new ol.Map({
           target: 'endMap',
           layers: [
-            new TileLayer({
-              source: new XYZ({
+            new ol.layer.Tile({
+              source: new ol.source.XYZ({
                 url: 'https://{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png'
               })
             }),
             endVectorLayer
           ],
-          view: new View({
-            center: Proj.transform([-432.559, 42.36], 'EPSG:4326', 'EPSG:3857'),
+          view: new ol.View({
+            center: ol.proj.transform([-432.559, 42.36], 'EPSG:4326', 'EPSG:3857'),
             zoom: 9
           })
     });
-    var iconStyle = new Style({
-    image: new Icon({
+    var iconStyle = new ol.style.Style({
+    image: new ol.style.Icon({
         anchor: [0.5, 46],
         anchorXUnits: 'fraction',
         anchorYUnits: 'pixels',
         opacity: 0.75,
         src: '//openlayers.org/en/v3.8.2/examples/data/icon.png'
     }),
-    text: new Text({
+    text: new ol.style.Text({
         font: '12px Calibri,sans-serif',
-        fill: new Fill({ color: '#000' }),
-        stroke: new Stroke({
+        fill: new ol.style.Fill({ color: '#000' }),
+        stroke: new ol.style.Stroke({
             color: '#fff', width: 2
         }),
         text: 'Some text'
     })
     });
     startMap.on('click', function(e) {
-      var lonlat = Proj.transform(e.coordinate, 'EPSG:3857', 'EPSG:4326');
+      var lonlat = ol.proj.transform(e.coordinate, 'EPSG:3857', 'EPSG:4326');
       this.startLongitude = lonlat[0];
       this.startLatitude = lonlat[1];
-      var feature = new Feature({
-        geometry: new Point(e.coordinate)
+      var feature = new ol.Feature({
+        geometry: new ol.geom.Point(e.coordinate)
       });
       feature.setStyle(iconStyle);
       startVectorSource.clear();
@@ -127,11 +128,11 @@ export class LocationsComponent implements OnInit {
     }, this);
 
     endMap.on('click', function(e) {
-      var lonlat = Proj.transform(e.coordinate, 'EPSG:3857', 'EPSG:4326');
+      var lonlat = ol.proj.transform(e.coordinate, 'EPSG:3857', 'EPSG:4326');
       this.endLongitude = lonlat[0];
       this.endLatitude = lonlat[1];
-      var feature = new Feature({
-        geometry: new Point(e.coordinate)
+      var feature = new ol.Feature({
+        geometry: new ol.geom.Point(e.coordinate)
       });
       feature.setStyle(iconStyle);
       endVectorSource.clear();
