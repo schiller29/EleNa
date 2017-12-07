@@ -3,21 +3,6 @@ import { Location } from '../models/location';
 import { LocationService } from '../services/location.service';
 import { Options } from '../models/options';
 
-//probably can condense this
-/*import SourceVector from '../../../node_modules/ol/source/vector';
-import LayerVector from '../../../node_modules/ol/layer/vector';
-import Text from '../../../node_modules/ol/style/text';
-import Fill from '../../../node_modules/ol/style/fill';
-import Stroke from '../../../node_modules/ol/style/stroke';
-import Icon from '../../../node_modules/ol/style/icon';
-import Style from '../../../node_modules/ol/style/style';
-import Proj from '../../../node_modules/ol/proj';
-import Map from '../../../node_modules/ol/map';
-import View from '../../../node_modules/ol/view';
-import TileLayer from '../../../node_modules/ol/layer/tile';
-import XYZ from '../../../node_modules/ol/source/xyz';
-import Point from '../../../node_modules/ol/geom/point';
-import Feature from '../../../node_modules/ol/feature';*/
 declare var ol: any;
 
 @Component({
@@ -52,6 +37,7 @@ export class LocationsComponent implements OnInit {
     console.log("Limit: " + this.limit);
   }
 
+  // needs rewriting
   loadLocation(latitude, longitude, location) {
     this.locationService.getLocation(latitude, longitude).subscribe(data => location = data);
   }
@@ -72,14 +58,14 @@ export class LocationsComponent implements OnInit {
       target: 'startMap',
       layers: [
         new ol.layer.Tile({
-          source: new ol.source.XYZ({
+          source: new ol.source.OSM({
             url: 'https://{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png'
           })
         }),
         startVectorLayer
       ],
       view: new ol.View({
-        center: ol.proj.transform([-432.559, 42.36], 'EPSG:4326', 'EPSG:3857'),
+        center: ol.proj.fromLonLat([-72.49, 42.25]),//ol.proj.transform([-432.559, 42.36], 'EPSG:4326', 'EPSG:3857'),
         zoom: 9
       })
     });
@@ -87,14 +73,14 @@ export class LocationsComponent implements OnInit {
           target: 'endMap',
           layers: [
             new ol.layer.Tile({
-              source: new ol.source.XYZ({
+              source: new ol.source.OSM({
                 url: 'https://{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png'
               })
             }),
             endVectorLayer
           ],
           view: new ol.View({
-            center: ol.proj.transform([-432.559, 42.36], 'EPSG:4326', 'EPSG:3857'),
+            center: ol.proj.fromLonLat([-72.49, 42.25]);//ol.proj.transform([-432.559, 42.36], 'EPSG:4326', 'EPSG:3857'),
             zoom: 9
           })
     });
@@ -112,11 +98,10 @@ export class LocationsComponent implements OnInit {
         stroke: new ol.style.Stroke({
             color: '#fff', width: 2
         }),
-        text: 'Some text'
     })
     });
     startMap.on('click', function(e) {
-      var lonlat = ol.proj.transform(e.coordinate, 'EPSG:3857', 'EPSG:4326');
+      var lonlat = ol.proj.toLonLat(e.coordinate, new ol.proj.Projection({code: 'EPSG:3857'}));
       this.startLongitude = lonlat[0];
       this.startLatitude = lonlat[1];
       var feature = new ol.Feature({
@@ -128,7 +113,7 @@ export class LocationsComponent implements OnInit {
     }, this);
 
     endMap.on('click', function(e) {
-      var lonlat = ol.proj.transform(e.coordinate, 'EPSG:3857', 'EPSG:4326');
+      var lonlat = ol.proj.toLonLat(e.coordinate, new ol.proj.Projection({code: 'EPSG:3857'}));
       this.endLongitude = lonlat[0];
       this.endLatitude = lonlat[1];
       var feature = new ol.Feature({
