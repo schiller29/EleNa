@@ -33,8 +33,8 @@
     </label>
 </div>
 
-<app-options></app-options>
-
-<p>
-  <button (click)="submit()">Start</button>
-</p>
+<app-options [startLongitude]=startLongitude
+  [startLatitude]=startLatitude
+  [endLongitude]=endLongitude
+  [endLatitude]=endLatitude>
+</app-options>
