@@ -27,7 +27,14 @@ export class LocationsComponent implements OnInit {
   minimizeElevation: boolean;
   limit: number;
 
+  startLatitudeError: boolean = false;
+  startLongitudeError: boolean = false;
+  endLatitudeError: boolean = false;
+  endLongitudeError: boolean = false;
+  
+
   submit() {
+    if (!this.checkInputError()){
     this.loadLocation(this.startLatitude, this.startLongitude, this.startLocation);
     this.loadLocation(this.endLatitude, this.endLongitude, this.endLocation);
     console.log('start loc: ' + this.startLocation);
@@ -35,6 +42,11 @@ export class LocationsComponent implements OnInit {
     console.log("Maximize: " + this.maximizeElevation);
     console.log("Minimize: " + this.minimizeElevation);
     console.log("Limit: " + this.limit);
+    this.startLatitudeError = false;
+    this.startLongitudeError = false;
+    this.endLatitudeError = false;
+    this.endLongitudeError = false;
+  }
   }
 
   // needs rewriting
@@ -42,6 +54,26 @@ export class LocationsComponent implements OnInit {
     this.locationService.getLocation(latitude, longitude).subscribe(data => location = data);
   }
 
+  checkInputError(){
+    var inputError = false;
+    if(isNaN(this.startLatitude)){
+      this.startLatitudeError = true;
+      inputError = true;
+    }
+    if(isNaN(this.startLongitude)){
+      this.startLongitudeError = true;
+      inputError = true;
+    }
+    if(isNaN(this.endLatitude)){
+      this.endLatitudeError = true;
+      inputError = true;
+    }
+    if(isNaN(this.endLongitude)){
+      this.endLongitudeError = true;
+      inputError = true;
+    }
+    return inputError;
+  }
   ngOnInit() {
 
     var startVectorSource = new ol.source.Vector();
@@ -80,7 +112,7 @@ export class LocationsComponent implements OnInit {
             endVectorLayer
           ],
           view: new ol.View({
-            center: ol.proj.fromLonLat([-72.49, 42.25]);//ol.proj.transform([-432.559, 42.36], 'EPSG:4326', 'EPSG:3857'),
+            center: ol.proj.fromLonLat([-72.49, 42.25]),//ol.proj.transform([-432.559, 42.36], 'EPSG:4326', 'EPSG:3857'),
             zoom: 9
           })
     });
