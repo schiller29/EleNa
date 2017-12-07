@@ -1,12 +1,19 @@
+<script>
+  function elevationClick(type){
+    if(type==='max'){
+      document.getElementById
+    }
+  }
+</script>
 <h3>Additional Options:</h3>
 <div>
     <label>Maximize Elevation Gain:
-      <input [(ngModel)]="maximizeElevation" placeholder="maximize" type="checkbox">
+      <input [(ngModel)]="maximizeElevation" placeholder="maximize" type="checkbox" (change)="elevationClick('maximize')" >
     </label>
 </div>
 <div>
     <label>Minimize Elevation Gain:
-      <input [(ngModel)]="minimizeElevation" placeholder="minimize" type="checkbox">
+      <input [(ngModel)]="minimizeElevation" placeholder="minimize" type="checkbox" (change)="elevationClick('minimize')" >
     </label>
 </div>
 <div>
@@ -14,3 +21,5 @@
       <input [(ngModel)]="limit" placeholder="percentage">
     </label>
 </div>
+
+<button (click)="submit()">Start</button>

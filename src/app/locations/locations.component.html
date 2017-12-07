@@ -9,11 +9,17 @@
 <h3>Start Location:</h3>
 <div class="map" id="startMap"></div>
 <div>
+	<div *ngIf="startLatitudeError" style="color:red">
+    	<div ng-message="validationError">Please Enter a Correct Start Latitude</div>
+	</div>
     <label>Latitude:
       <input [(ngModel)]="startLatitude" placeholder="latitude">
     </label>
 </div>
 <div>
+	<div *ngIf="startLongitudeError" style="color:red">
+    	<div ng-message="validationError">Please Enter a Correct Start Longtitude</div>
+	</div>
     <label>Longitude:
       <input [(ngModel)]="startLongitude" placeholder="longitude">
     </label>
@@ -23,18 +29,24 @@
 
 <div class="map" id="endMap"></div>
 <div>
+	<div *ngIf="endLatitudeError" style="color:red">
+    	<div ng-message="validationError">Please Enter a Correct End Latitude</div>
+	</div>
     <label>Latitude:
       <input [(ngModel)]="endLatitude" placeholder="latitude">
     </label>
 </div>
 <div>
+	<div *ngIf="endLongitudeError" style="color:red">
+    	<div ng-message="validationError">Please Enter a Correct End Longtitude</div>
+	</div>
     <label>Longitude:
       <input [(ngModel)]="endLongitude" placeholder="longitude">
     </label>
 </div>
 
-<app-options></app-options>
-
-<p>
-  <button (click)="submit()">Start</button>
-</p>
+<app-options [startLongitude]=startLongitude
+  [startLatitude]=startLatitude
+  [endLongitude]=endLongitude
+  [endLatitude]=endLatitude>
+</app-options>
