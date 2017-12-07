@@ -70,7 +70,6 @@ export class LocationsComponent implements OnInit {
     });
 
   //  startMap.getView().fit(extentToZoom,startMap.getSize())
-
     var endMap = new ol.Map({
       target: 'endMap',
       layers: [

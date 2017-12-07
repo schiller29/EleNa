@@ -25,6 +25,11 @@ export class OptionsComponent implements OnInit {
   minimizeElevation: boolean;
   limit: number;
 
+  startLatitudeError: boolean = false;
+  startLongitudeError: boolean = false;
+  endLatitudeError: boolean = false;
+  endLongitudeError: boolean = false;
+
   ngOnInit() {
     this.maximizeElevation = false;
     this.minimizeElevation = false;
@@ -41,14 +46,38 @@ export class OptionsComponent implements OnInit {
       }
     }
   }
+
   submit() {
-    this.loadLocation(this.startLatitude, this.startLongitude, this.startLocation);
-    this.loadLocation(this.endLatitude, this.endLongitude, this.endLocation);
-    console.log('start loc: ' + this.startLocation);
-    console.log('end loc: ' + this.endLocation);
-    console.log("Maximize: " + this.maximizeElevation);
-    console.log("Minimize: " + this.minimizeElevation);
-    console.log("Limit: " + this.limit);
+    if (!this.checkInputError()){
+      this.loadLocation(this.startLatitude, this.startLongitude, this.startLocation);
+      this.loadLocation(this.endLatitude, this.endLongitude, this.endLocation);
+      console.log('start loc: ' + this.startLocation);
+      console.log('end loc: ' + this.endLocation);
+      console.log("Maximize: " + this.maximizeElevation);
+      console.log("Minimize: " + this.minimizeElevation);
+      console.log("Limit: " + this.limit);
+    }
+  }
+
+  checkInputError(){
+    var inputError = false;
+    if(isNaN(this.startLatitude)){
+      this.startLatitudeError = true;
+      inputError = true;
+    }
+    if(isNaN(this.startLongitude)){
+      this.startLongitudeError = true;
+      inputError = true;
+    }
+    if(isNaN(this.endLatitude)){
+      this.endLatitudeError = true;
+      inputError = true;
+    }
+    if(isNaN(this.endLongitude)){
+      this.endLongitudeError = true;
+      inputError = true;
+    }
+    return inputError;
   }
 
   // needs rewriting
