@@ -21,5 +21,8 @@
       <input [(ngModel)]="limit" placeholder="percentage">
     </label>
 </div>
-
-<button (click)="submit()">Start</button>
+<br>
+<app-route *ngIf="mapRoute">
+</app-route>
+<br>
+<button (click)="submit()">{{buttonText}}</button>

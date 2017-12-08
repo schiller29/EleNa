@@ -30,11 +30,15 @@ export class OptionsComponent implements OnInit {
   endLatitudeError: boolean = false;
   endLongitudeError: boolean = false;
 
+  buttonText: string;
+  mapRoute: boolean;
+
   ngOnInit() {
     this.maximizeElevation = false;
     this.minimizeElevation = false;
     this.limit = 0;
-    //init logic
+    this.buttonText = "Route";
+    this.mapRoute = false;
   }
 
   elevationClick(val){
@@ -49,13 +53,10 @@ export class OptionsComponent implements OnInit {
 
   submit() {
     if (!this.checkInputError()){
-      this.loadLocation(this.startLatitude, this.startLongitude, this.startLocation);
-      this.loadLocation(this.endLatitude, this.endLongitude, this.endLocation);
-      console.log('start loc: ' + this.startLocation);
-      console.log('end loc: ' + this.endLocation);
-      console.log("Maximize: " + this.maximizeElevation);
-      console.log("Minimize: " + this.minimizeElevation);
-      console.log("Limit: " + this.limit);
+      this.loadLocations(this.startLatitude, this.startLongitude, this.endLatitude, this.endLongitude);
+    } else {
+      this.mapRoute = false;
+      this.buttonText = 'Route';
     }
   }
 
@@ -79,11 +80,28 @@ export class OptionsComponent implements OnInit {
     }
     return inputError;
   }
-
-  // needs rewriting
-  loadLocation(latitude, longitude, location) {
-    this.locationService.getLocation(latitude, longitude).subscribe(data => location = data);
-    console.log(this.locationService.getLocation(latitude, longitude));
+  startRoute(){
+    console.log(this.startLocation);
+    console.log(this.endLocation);
+    console.log("Maximize: " + this.maximizeElevation);
+    console.log("Minimize: " + this.minimizeElevation);
+    console.log("Limit: " + this.limit);
+    //only execute if locations loaded ok
+    if(this.startLocation && this.endLocation){
+      this.mapRoute = true;
+      this.buttonText = 'Re-route';
+    }
   }
-
+  // needs rewriting
+  loadLocations(sLatitude, sLongitude, eLatitude, eLongitude) {
+    this.locationService.getLocation(sLatitude, sLongitude)
+      .subscribe(data => {
+        this.startLocation = data;
+        this.locationService.getLocation(eLatitude, eLongitude)
+          .subscribe(data => {
+            this.endLocation = data;
+            this.startRoute();
+          });
+      });
+  }
 }

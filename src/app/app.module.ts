@@ -9,13 +9,15 @@ import { LocationsComponent } from './locations/locations.component';
 import { OptionsComponent } from './options/options.component';
 
 import { LocationService } from './services/location.service';
+import { RouteComponent } from './route/route.component';
 
 
 @NgModule({
   declarations: [
     AppComponent,
     LocationsComponent,
-    OptionsComponent
+    OptionsComponent,
+    RouteComponent
   ],
   imports: [
     BrowserModule,

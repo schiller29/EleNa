@@ -47,6 +47,7 @@ export class LocationsComponent implements OnInit {
         zoom: 9
       })
     });
+    
     var endMap = new ol.Map({
       target: 'endMap',
       layers: [
@@ -62,6 +63,7 @@ export class LocationsComponent implements OnInit {
         zoom: 9
       })
     });
+
     var iconStyle = new ol.style.Style({
       image: new ol.style.Icon({
           anchor: [0.5, 46],
@@ -78,6 +80,7 @@ export class LocationsComponent implements OnInit {
           }),
       })
     });
+
     startMap.on('click', function(e) {
       var lonlat = ol.proj.toLonLat(e.coordinate, new ol.proj.Projection({code: 'EPSG:3857'}));
       this.startLongitude = lonlat[0];
