@@ -47,7 +47,7 @@ export class LocationsComponent implements OnInit {
         zoom: 9
       })
     });
-
+    
     var endMap = new ol.Map({
       target: 'endMap',
       layers: [
