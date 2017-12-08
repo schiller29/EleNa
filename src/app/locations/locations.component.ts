@@ -22,26 +22,6 @@ export class LocationsComponent implements OnInit {
   endLongitude: number;
 
   ngOnInit() {
-/*
-    var coordinates = [
-      new ol.geom.Point([-72.60726928710939, 42.19717693341468]),
-      new ol.geom.Point([-72.61241912841795, 42.181007970107316]),
-      new ol.geom.Point([-72.56298065185545, 42.14639853939718]),
-      new ol.geom.Point([-72.44075775146483, 42.163705621262466]),
-      new ol.geom.Point([-72.40917205810547, 42.15556170171246]),
-    ];
-    var routeGeom = new ol.geom.LineString(coordinates).transform('EPSG:4326','EPSG:3857');
-    var routeFeature = new ol.Feature({geometry:routeGeom});
-    var extentToZoom = routeGeom.getExtent();
-    console.log(extentToZoom);
-    console.log(routeFeature);
-    var routeVectorSource = new ol.source.Vector({
-      features: [routeFeature]
-    });
-    var routeVectorLayer = new ol.layer.Vector({
-      source: routeVectorSource
-    });*/
-
     var startVectorSource = new ol.source.Vector();
     var startVectorLayer = new ol.layer.Vector({
       source: startVectorSource
@@ -61,7 +41,6 @@ export class LocationsComponent implements OnInit {
           })
         }),
         startVectorLayer
-      //  routeVectorLayer
       ],
       view: new ol.View({
         center: ol.proj.fromLonLat([-72.49, 42.25]),//ol.proj.transform([-432.559, 42.36], 'EPSG:4326', 'EPSG:3857'),
@@ -69,7 +48,6 @@ export class LocationsComponent implements OnInit {
       })
     });
 
-  //  startMap.getView().fit(extentToZoom,startMap.getSize())
     var endMap = new ol.Map({
       target: 'endMap',
       layers: [
@@ -85,6 +63,7 @@ export class LocationsComponent implements OnInit {
         zoom: 9
       })
     });
+
     var iconStyle = new ol.style.Style({
       image: new ol.style.Icon({
           anchor: [0.5, 46],
@@ -101,6 +80,7 @@ export class LocationsComponent implements OnInit {
           }),
       })
     });
+
     startMap.on('click', function(e) {
       var lonlat = ol.proj.toLonLat(e.coordinate, new ol.proj.Projection({code: 'EPSG:3857'}));
       this.startLongitude = lonlat[0];
