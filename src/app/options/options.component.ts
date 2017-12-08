@@ -80,6 +80,7 @@ export class OptionsComponent implements OnInit {
     }
     return inputError;
   }
+  
   startRoute(){
     console.log(this.startLocation);
     console.log(this.endLocation);
