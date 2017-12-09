@@ -1,0 +1,16 @@
+h3 {
+  //text-align: center;
+  margin-left: 1.5rem;
+  margin-bottom: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+label{
+  // display: block;
+  //text-align: center;
+  margin-left: 1.5rem;
+}
+
+button{
+  margin-left: 1.5rem;
+}

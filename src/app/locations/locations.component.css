@@ -6,4 +6,17 @@ html, body, .map {
 .map {
   width: 50%;
   height: 300px;
+  //display: block;
+  margin-left: 1.5rem;
+}
+
+h3 {
+  //text-align: center;
+  margin: 1.5rem;
+}
+label{
+  // display: block;
+  //text-align: center;
+  margin-left: 1.5rem;
+  margin-top: 1.5rem;
 }
