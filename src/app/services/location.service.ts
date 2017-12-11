@@ -10,9 +10,24 @@ export class LocationService {
 
   BASE_URL = 'https://api.open-elevation.com/api/v1/lookup?locations=';
 
+  OVERPASS_INTERSECTION_URL = 'https://www.overpass-api.de/api/interpreter?data=[out:json];(way(';
+
+  OVERPASS_WAY_URL = 'https://www.overpass-api.de/api/interpreter?data=[out:json];way(';
+
+  OVERPASS_INTERSECTION_QUERY = ');)->.n1;foreach.n1((.n1;%20-%20._;)->.n2;node(w._)->.n3;node(w.n2)->.n2;node.n3.n2;out;);';
+
   getLocation(latitude, longitude) {
     return this.http.get(this.BASE_URL+latitude+","+longitude)
     .map((res:Response) => res.json());
   }
 
+  getNodes(minLat, minLong, maxLat, maxLong) {
+    return this.http.get(this.OVERPASS_INTERSECTION_URL+minLat+","+minLong+","+maxLat+","+maxLong+this.OVERPASS_INTERSECTION_QUERY)
+    .map((res:Response) => res.json());
+  }
+
+  getWays(minLat, minLong, maxLat, maxLong) {
+    return this.http.get(this.OVERPASS_WAY_URL+minLat+","+minLong+","+maxLat+","+maxLong+");out%20meta;")
+    .map((res:Response) => res.json());
+  }
 }
