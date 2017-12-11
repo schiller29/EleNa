@@ -16,10 +16,12 @@ export class OptionsComponent implements OnInit {
 
   constructor(private locationService: LocationService) { }
 
-  nodeList: Node;
-  vertices: Vertex[];
-  wayList: Way;
-  edges: Edge[];
+  nodeList: Node[];
+  vertices: Vertex[] = [];
+  wayList: Way[];
+  edges: Edge[] = [];
+
+  intersectingNodes: number[] = [];
 
   startLocation: Location;
   @Input() startLongitude: number;
@@ -133,8 +135,16 @@ export class OptionsComponent implements OnInit {
             this.wayList = data.elements;
             console.log(this.wayList);
             console.log('way data loaded');
+            this.populateLists();
           })
     })
+  }
+
+  populateLists() {
+    this.nodeList.forEach(element => {
+      this.intersectingNodes.push(element.id);
+    });
+    console.log(this.intersectingNodes);
   }
 
   // needs rewriting
