@@ -143,7 +143,6 @@ export class OptionsComponent implements OnInit {
     } else {
       this.limitError = false;
     }
-    this.errorMessage = "Please enter valid: " + errorArray.join(", ");
     return inputError;
   }
   
