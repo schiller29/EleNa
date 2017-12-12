@@ -1,21 +1,28 @@
-<h3>Additional Options:</h3>
-<div>
-    <label>Maximize Elevation Gain:
-      <input [(ngModel)]="maximizeElevation" placeholder="maximize" type="checkbox" (change)="elevationClick('maximize')" >
-    </label>
+<div class="row">
+  <div class="col-4">
+    <h4>Additional Options</h4>
+    <div>
+        <label>Maximize Elevation Gain:
+          <input [(ngModel)]="maximizeElevation" placeholder="maximize" type="checkbox" (change)="elevationClick('maximize')" >
+        </label>
+    </div>
+    <div>
+        <label>Minimize Elevation Gain:
+          <input [(ngModel)]="minimizeElevation" placeholder="minimize" type="checkbox" (change)="elevationClick('minimize')" >
+        </label>
+    </div>  
+    <div>
+        <label>Limit on Total Distance:
+          <input [(ngModel)]="limit" placeholder="percentage">
+        </label>
+    </div>
+    <br>
+    
+  <button (click)="submit()">{{buttonText}}</button>  
+  </div>
+  <div class="col-8">
+    <app-route *ngIf="mapRoute">
+    </app-route>
+    <br>
+  </div>
 </div>
-<div>
-    <label>Minimize Elevation Gain:
-      <input [(ngModel)]="minimizeElevation" placeholder="minimize" type="checkbox" (change)="elevationClick('minimize')" >
-    </label>
-</div>
-<div>
-    <label>Limit on Total Distance:
-      <input [(ngModel)]="limit" placeholder="percentage">
-    </label>
-</div>
-<br>
-<app-route *ngIf="mapRoute">
-</app-route>
-<br>
-<button (click)="submit()">{{buttonText}}</button>

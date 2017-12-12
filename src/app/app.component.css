@@ -1,6 +1,9 @@
 @import '~bootstrap/dist/css/bootstrap.min.css';
 .navbar-brand {
-	font-size: 3.8rem;
+	font-size: 3rem;
 	font-weight: 60;
-
+}
+.vertical-align {
+    display: flex;
+    align-items: center;
 }
