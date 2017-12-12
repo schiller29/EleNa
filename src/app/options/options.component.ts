@@ -145,11 +145,12 @@ export class OptionsComponent implements OnInit {
   populateEdges() {
     this.nodeList.forEach(node => {
       let edgeArr: Edge[] = [];
+      let uniqueEdges: number[] = [];
       this.wayList.forEach(way => {
         if (way.nodes.includes(node.id)) {
           way.nodes.forEach(x => {
             if (x != node.id && this.intersectingNodes.includes(x)) {
-              this.populateInnerEdge(node.id, x, edgeArr);
+              this.populateInnerEdge(node.id, x, edgeArr, uniqueEdges);
             }
           });
         }
@@ -157,11 +158,12 @@ export class OptionsComponent implements OnInit {
       this.edges.push(edgeArr);
     });
     console.log(this.edges);
+    console.log('printed edges');
   }
 
-  populateInnerEdge(sid, eid, edgeArr) {
+  populateInnerEdge(sid, eid, edgeArr, uniqueEdges) {
     let start: GeoCoord = {latitude: 0, longitude: 0};
-    let end: GeoCoord= {latitude: 0, longitude: 0};
+    let end: GeoCoord = {latitude: 0, longitude: 0};
     let vid: number;
     this.nodeList.forEach(element => {
       if(element.id == sid) {
@@ -184,7 +186,10 @@ export class OptionsComponent implements OnInit {
       distance: dist,
       endpoint_id: eid
     };
-    edgeArr.push(edge);
+    if(!uniqueEdges.includes(edge.vid)) {
+      edgeArr.push(edge);
+      uniqueEdges.push(edge.vid);
+    }
   }
 
   populateLists() {
@@ -220,6 +225,7 @@ export class OptionsComponent implements OnInit {
       count++;
     });
     console.log(this.vertices);
+    console.log('printed vertices');
   }
 
   // needs rewriting
