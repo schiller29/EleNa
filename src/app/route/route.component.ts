@@ -1,6 +1,5 @@
 import { Component, Input, OnInit, ElementRef, ViewChild } from '@angular/core';
 import { Http } from '@angular/http';
-import { Element } from '@angular/compiler';
 
 declare var ol: any;
 

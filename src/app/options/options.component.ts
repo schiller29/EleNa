@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, ElementRef, ViewChild } from '@angular/core';
 import { Options } from '../models/options';
 import { Location } from '../models/location';
 import { Node } from '../models/node';
@@ -7,6 +7,7 @@ import { Way } from '../models/way';
 import { Edge } from '../models/edge';
 import { LatLon } from '../models/latlon';
 import { LocationService } from '../services/location.service';
+import { ModalComponent } from '../modal/modal.component';
 
 @Component({
   selector: 'app-options',
@@ -43,11 +44,16 @@ export class OptionsComponent implements OnInit {
   startLongitudeError: boolean = false;
   endLatitudeError: boolean = false;
   endLongitudeError: boolean = false;
+  limitError: boolean = false;
 
   errorMessage : string = "";
 
   buttonText: string;
   mapRoute: boolean;
+
+  errorText: string;
+  @ViewChild('modal') modal: ModalComponent;
+
 
   ngOnInit() {
     this.maximizeElevation = false;
@@ -77,8 +83,30 @@ export class OptionsComponent implements OnInit {
     } else {
       this.mapRoute = false;
       this.buttonText = 'Route';
+      this.errorText = this.generateErrorText();
+      this.modal.show();  
     }
-    console.log(this.endLatitudeError);
+  }
+
+  generateErrorText(){
+    var error = "";
+    if(this.startLatitudeError){
+      error+="Start Latitude, ";
+    }
+    if(this.startLongitudeError){
+      error+="Start Longitude, ";
+    }
+    if(this.endLatitudeError){
+      error+="End Latitude, ";
+    }
+    if(this.endLongitudeError){
+      error+="End Longitude, ";
+    }
+    if(this.limitError){
+      error+="Total Distance Limit, ";
+    }
+    error = error.slice(0, -2);
+    return error;
   }
 
   checkInputError(){
@@ -88,22 +116,32 @@ export class OptionsComponent implements OnInit {
     if(isNaN(this.startLatitude) || this.startLatitude == 0){
       this.startLatitudeError = true;
       inputError = true;
-      errorArray.push("Start Latitude");
+    } else {
+      this.startLatitudeError = false;
     }
     if(isNaN(this.startLongitude) || this.startLongitude == 0){
       this.startLongitudeError = true;
       inputError = true;
-      errorArray.push("Start Longitude");
+    } else {
+      this.startLongitudeError = false;
     }
     if(isNaN(this.endLatitude) || this.endLatitude == 0){
       this.endLatitudeError = true;
       inputError = true;
-      errorArray.push("End Latitude");
+    } else {
+      this.endLatitudeError = false;
     }
     if(isNaN(this.endLongitude) || this.endLongitude == 0){
       this.endLongitudeError = true;
       inputError = true;
-      errorArray.push("End Longitude");
+    } else {
+      this.endLongitudeError = false;
+    }
+    if(isNaN(this.limit)){
+      this.limitError = true;
+      inputError = true;
+    } else {
+      this.limitError = false;
     }
     this.errorMessage = "Please enter valid: " + errorArray.join(", ");
     return inputError;
@@ -129,12 +167,7 @@ export class OptionsComponent implements OnInit {
       var minLong = sLongitude;
       var maxLong = eLongitude;
     }
-    //only execute if locations loaded ok
-    if(this.startLocation && this.endLocation){
-      this.mapRoute = true;
-      this.buttonText = 'Re-route';
-      console.log('loading intersection data')
-    }
+    console.log('loading intersection data');
     this.loadData(minLat, minLong, maxLat, maxLong);
   }
 
@@ -187,6 +220,8 @@ export class OptionsComponent implements OnInit {
       count++;
     });
     console.log(this.vertices);
+    this.mapRoute = true;
+    this.buttonText = 'Re-route';
   }
 
   // needs rewriting

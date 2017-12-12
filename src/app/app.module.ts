@@ -10,6 +10,7 @@ import { OptionsComponent } from './options/options.component';
 import { RouteComponent } from './route/route.component';
 
 import { LocationService } from './services/location.service';
+import { ModalComponent } from './modal/modal.component';
 
 
 @NgModule({
@@ -17,7 +18,8 @@ import { LocationService } from './services/location.service';
     AppComponent,
     LocationsComponent,
     OptionsComponent,
-    RouteComponent
+    RouteComponent,
+    ModalComponent
   ],
   imports: [
     BrowserModule,

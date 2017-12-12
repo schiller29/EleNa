@@ -7,3 +7,11 @@
     display: flex;
     align-items: center;
 }
+
+
+.modal-footer class{
+	padding-top:0px !important; 
+	border-top:none !important; 
+	padding-bottom:0px !important;
+	display:none !important;
+  }
