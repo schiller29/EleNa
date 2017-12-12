@@ -154,9 +154,25 @@ export class OptionsComponent implements OnInit {
     console.log(this.latlonList);
     this.locationService.getLocation(this.latlonList)
       .subscribe(data => {
-        this.location = data;
+        this.location = data.results;
         console.log(this.location);
+        this.populateVertices();
       })
+  }
+
+  populateVertices() {
+    let count = 0;
+    this.location.forEach(element => {
+      let vertex: Vertex = {
+        vid: count,
+        lat: element.latitude,
+        long: element.longitude,
+        elev: element.elevation
+      };
+      this.vertices.push(vertex);
+      count++;
+    });
+    console.log(this.vertices);
   }
 
   // needs rewriting
