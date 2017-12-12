@@ -44,7 +44,7 @@ export class LocationsComponent implements OnInit {
       ],
       view: new ol.View({
         center: ol.proj.fromLonLat([-72.49, 42.25]),//ol.proj.transform([-432.559, 42.36], 'EPSG:4326', 'EPSG:3857'),
-        zoom: 9
+        zoom: 11
       })
     });
 
@@ -60,7 +60,7 @@ export class LocationsComponent implements OnInit {
       ],
       view: new ol.View({
         center: ol.proj.fromLonLat([-72.49, 42.25]),//ol.proj.transform([-432.559, 42.36], 'EPSG:4326', 'EPSG:3857'),
-        zoom: 9
+        zoom: 11
       })
     });
 

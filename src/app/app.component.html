@@ -1,14 +1,22 @@
-<h1><nav class="navbar navbar-light bg-faded">
-  <a class="navbar-brand" href="#">
-    <img src="assets/mountain.png" width="70" height="70" class="d-inline-block align-top" alt="">
-    {{title}}
-  </a>
-  <nav class="navbar navbar-light bg-faded">
-  <span class="navbar-text">
-    Elevation based navigation
-  </span>
+<nav class="navbar navbar-light bg-faded" style="margin-bottom:0px; padding-bottom:0px;">
+  <div class="row vertical-align" style="width:100%;">
+    <div class="col-3">
+      <h2>
+        <a class="navbar-brand" href="#">
+          <img src="assets/mountain.png" width="60" height="60" class="d-inline-block align-top" alt="">
+          {{title}}
+        </a>
+      </h2>
+    </div>
+    <div class="col-9">
+      <h3>
+        <span class="navbar-text">
+            Elevation based navigation
+        </span>
+      </h3>
+    </div>
+  </div>
 </nav>
-</nav></h1>
 
-
+<hr style="margin-top:0px; margin-bottom:5px;">
 <app-locations></app-locations>

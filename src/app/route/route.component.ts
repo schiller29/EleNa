@@ -1,5 +1,6 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, ElementRef, ViewChild } from '@angular/core';
 import { Http } from '@angular/http';
+import { Element } from '@angular/compiler';
 
 declare var ol: any;
 
@@ -15,6 +16,8 @@ export class RouteComponent implements OnInit {
   constructor(private http:Http) {
   }
 
+  
+  @ViewChild('routeMapDiv') routeMapDiv: ElementRef;
 
   ngOnInit() {
     this.http.get('assets/data.json')
@@ -26,7 +29,6 @@ export class RouteComponent implements OnInit {
   }
   mapRoute(lonlat){
     console.log(lonlat);
-
     var routeGeom = new ol.geom.LineString(lonlat);
     routeGeom = routeGeom.transform('EPSG:4326', 'EPSG:3857');
     var routeFeature = new ol.Feature({geometry:routeGeom});
@@ -57,8 +59,7 @@ export class RouteComponent implements OnInit {
         zoom: 9
       })
     });
-
     routeMap.getView().fit(extentToZoom,routeMap.getSize())
-
+    this.routeMapDiv.nativeElement.scrollIntoView();
   }
 }
