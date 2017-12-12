@@ -5,6 +5,7 @@ import { Node } from '../models/node';
 import { Vertex } from '../models/vertex';
 import { Way } from '../models/way';
 import { Edge } from '../models/edge';
+import { LatLon } from '../models/latlon';
 import { LocationService } from '../services/location.service';
 
 @Component({
@@ -20,6 +21,8 @@ export class OptionsComponent implements OnInit {
   vertices: Vertex[] = [];
   wayList: Way[];
   edges: Edge[] = [];
+  location: Location[];
+  latlonList: LatLon[] = [];
 
   intersectingNodes: number[] = [];
 
@@ -93,8 +96,6 @@ export class OptionsComponent implements OnInit {
   }
   
   startRoute(sLatitude, sLongitude, eLatitude, eLongitude){
-    console.log(this.startLocation);
-    console.log(this.endLocation);
     console.log("Maximize: " + this.maximizeElevation);
     console.log("Minimize: " + this.minimizeElevation);
     console.log("Limit: " + this.limit);
@@ -119,8 +120,8 @@ export class OptionsComponent implements OnInit {
       this.mapRoute = true;
       this.buttonText = 'Re-route';
       console.log('loading intersection data')
-      this.loadData(minLat, minLong, maxLat, maxLong);
     }
+    this.loadData(minLat, minLong, maxLat, maxLong);
   }
 
   loadData(minLat, minLong, maxLat, maxLong) {
@@ -143,20 +144,36 @@ export class OptionsComponent implements OnInit {
   populateLists() {
     this.nodeList.forEach(element => {
       this.intersectingNodes.push(element.id);
+      let latlon: LatLon = {
+        lat: element.lat,
+        lon: element.lon
+      };
+      this.latlonList.push(latlon);
     });
     console.log(this.intersectingNodes);
+    console.log(this.latlonList);
+    this.locationService.getLocation(this.latlonList)
+      .subscribe(data => {
+        this.location = data;
+        console.log(this.location);
+      })
   }
 
   // needs rewriting
+  // loadLocations(sLatitude, sLongitude, eLatitude, eLongitude) {
+  //   this.locationService.getLocation(sLatitude, sLongitude)
+  //     .subscribe(data => {
+  //       this.startLocation = data;
+  //       this.locationService.getLocation(eLatitude, eLongitude)
+  //         .subscribe(data => {
+  //           this.endLocation = data;
+  //           this.startRoute(sLatitude, sLongitude, eLatitude, eLongitude);
+  //         });
+  //     });
+  // }
+
   loadLocations(sLatitude, sLongitude, eLatitude, eLongitude) {
-    this.locationService.getLocation(sLatitude, sLongitude)
-      .subscribe(data => {
-        this.startLocation = data;
-        this.locationService.getLocation(eLatitude, eLongitude)
-          .subscribe(data => {
-            this.endLocation = data;
-            this.startRoute(sLatitude, sLongitude, eLatitude, eLongitude);
-          });
-      });
+    this.startRoute(sLatitude, sLongitude, eLatitude, eLongitude);
   }
+
 }

@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Http, Response } from '@angular/http';
+import { LatLon } from '../models/latlon';
 import 'rxjs/add/operator/map';
 
 @Injectable()
@@ -16,8 +17,13 @@ export class LocationService {
 
   OVERPASS_INTERSECTION_QUERY = ');)->.n1;foreach.n1((.n1;%20-%20._;)->.n2;node(w._)->.n3;node(w.n2)->.n2;node.n3.n2;out;);';
 
-  getLocation(latitude, longitude) {
-    return this.http.get(this.BASE_URL+latitude+","+longitude)
+  getLocation(latlonList) {
+    let LATLON = '';
+    latlonList.forEach(element => {
+      LATLON = LATLON+element.lat+","+element.lon+"|";
+    });
+    LATLON = LATLON.substring(0, LATLON.length - 1);
+    return this.http.get(this.BASE_URL+LATLON)
     .map((res:Response) => res.json());
   }
 
