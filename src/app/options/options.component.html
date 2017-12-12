@@ -17,7 +17,11 @@
         </label>
     </div>
     <br>
-    
+  
+  <div *ngIf="endLatitudeError" style="color:red">
+    <div ng-message="validationError">{{errorMessage}}</div>
+</div>
+
   <button (click)="submit()">{{buttonText}}</button>  
   </div>
   <div class="col-8">
@@ -26,3 +30,4 @@
     <br>
   </div>
 </div>
+
