@@ -7,6 +7,7 @@ import { Way } from '../models/way';
 import { Edge } from '../models/edge';
 import { LatLon } from '../models/latlon';
 import { LocationService } from '../services/location.service';
+import { HaversineService, GeoCoord } from "ng2-haversine";
 
 @Component({
   selector: 'app-options',
@@ -15,12 +16,12 @@ import { LocationService } from '../services/location.service';
 })
 export class OptionsComponent implements OnInit {
 
-  constructor(private locationService: LocationService) { }
+  constructor(private locationService: LocationService, private _haversineService: HaversineService) { }
 
   nodeList: Node[];
   vertices: Vertex[] = [];
   wayList: Way[];
-  edges: Edge[] = [];
+  edges: any[] = [];
   location: Location[];
   latlonList: LatLon[] = [];
 
@@ -141,6 +142,51 @@ export class OptionsComponent implements OnInit {
     })
   }
 
+  populateEdges() {
+    this.nodeList.forEach(node => {
+      let edgeArr: Edge[] = [];
+      this.wayList.forEach(way => {
+        if (way.nodes.includes(node.id)) {
+          way.nodes.forEach(x => {
+            if (x != node.id && this.intersectingNodes.includes(x)) {
+              this.populateInnerEdge(node.id, x, edgeArr);
+            }
+          });
+        }
+      });
+      this.edges.push(edgeArr);
+    });
+    console.log(this.edges);
+  }
+
+  populateInnerEdge(sid, eid, edgeArr) {
+    let start: GeoCoord = {latitude: 0, longitude: 0};
+    let end: GeoCoord= {latitude: 0, longitude: 0};
+    let vid: number;
+    this.nodeList.forEach(element => {
+      if(element.id == sid) {
+        start.latitude = element.lat;
+        start.longitude = element.lon;
+      }
+      if(element.id == eid) {
+        end.latitude = element.lat;
+        end.longitude = element.lon;
+      }
+    });
+    let dist = this._haversineService.getDistanceInMeters(start, end);
+    this.vertices.forEach(v => {
+      if(v.lat == end.latitude && v.long == end.longitude) {
+        vid = v.vid;
+      }
+    });
+    let edge: Edge = {
+      vid: vid,
+      distance: dist,
+      endpoint_id: eid
+    };
+    edgeArr.push(edge);
+  }
+
   populateLists() {
     this.nodeList.forEach(element => {
       this.intersectingNodes.push(element.id);
@@ -157,6 +203,7 @@ export class OptionsComponent implements OnInit {
         this.location = data.results;
         console.log(this.location);
         this.populateVertices();
+        this.populateEdges();
       })
   }
 

@@ -10,6 +10,7 @@ import { OptionsComponent } from './options/options.component';
 import { RouteComponent } from './route/route.component';
 
 import { LocationService } from './services/location.service';
+import { HaversineService } from "ng2-haversine";
 
 
 @NgModule({
@@ -24,7 +25,7 @@ import { LocationService } from './services/location.service';
     FormsModule,
     HttpModule
   ],
-  providers: [LocationService],
+  providers: [LocationService, HaversineService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
