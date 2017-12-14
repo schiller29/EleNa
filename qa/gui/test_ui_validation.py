@@ -1,10 +1,11 @@
 from common import (chromedriver,
                     get_elem_by_selector,
                     wait_for_elem)
+
 from selenium import webdriver
 from selenium.common.exceptions import ElementNotVisibleException
-import unittest
 from time import sleep
+import unittest
 
 START_LATITUDE = 'Start Latitude'
 START_LONGTITUDE = 'Start Longitude'
@@ -42,6 +43,8 @@ class TestStringMethods(unittest.TestCase):
 
     def populate_elements(self):
         self.body = get_elem_by_selector(self.elena, 'body')
+        self.start_map = get_elem_by_selector(self.elena, '#startMap')
+        self.end_map = get_elem_by_selector(self.elena, '#endMap')
         self.start_lat = get_elem_by_selector(self.elena, '#startLatitude')
         self.start_lon = get_elem_by_selector(self.elena, '#startLongitude')
         self.end_lat = get_elem_by_selector(self.elena, '#endLatitude')
@@ -51,7 +54,8 @@ class TestStringMethods(unittest.TestCase):
         self.max_elevation = get_elem_by_selector(self.elena, '#maximize')
         self.min_elevation = get_elem_by_selector(self.elena, '#minimize')
         self.limit = get_elem_by_selector(self.elena, '#limit')
-        self.endMap = get_elem_by_selector(self.elena, '#endMap')
+        # TODO when the map funcitonality is working again, fix the ID
+        self.result_map = get_elem_by_selector(self.elena, '#endMap')
 
     def scroll_to_bottom(self, top=False):
         if top:
@@ -293,6 +297,13 @@ class TestStringMethods(unittest.TestCase):
         self.assertTrue('34' in source)
         self.assertTrue('45' in source)
 
+    def test_clicking_results_valid(self):
+        self.start_map.click()
+        self.end_map.click()
+        self.min_elevation.click()
+        self.submit()
+        self.assertTrue(self.result_map.is_displayed())
+
     def test_result_map(self):
         self.scroll_to_bottom()
         self.start_lat.send_keys('69')
@@ -303,7 +314,7 @@ class TestStringMethods(unittest.TestCase):
         self.limit.clear()
         self.limit.send_keys('10')
         self.submit()
-        self.assertTrue(self.endMap.is_displayed())
+        self.assertTrue(self.result_map.is_displayed())
 
 
 if __name__ == '__main__':
