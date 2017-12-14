@@ -111,39 +111,44 @@ export class OptionsComponent implements OnInit {
   }
 
   checkInputError(){
+    this.startLatitudeError = false;
+    this.startLongitudeError = false;
+    this.endLatitudeError = false;
+    this.endLongitudeError = false;
+
     var inputError = false;
-    var errorArray = [];
-    //just going to assume for simplicity's sake that is an invalid lat + long
-    if(isNaN(this.startLatitude) || this.startLatitude == 0){
+    //just going to assume for simplicity's sake that 0 is an invalid lat + long
+    if(isNaN(this.startLatitude) || this.startLatitude == 0 || Math.abs(this.startLatitude) > 90){
       this.startLatitudeError = true;
       inputError = true;
     } else {
       this.startLatitudeError = false;
     }
-    if(isNaN(this.startLongitude) || this.startLongitude == 0){
+    if(isNaN(this.startLongitude) || this.startLongitude == 0 || Math.abs(this.startLongitude) > 180){
       this.startLongitudeError = true;
       inputError = true;
     } else {
       this.startLongitudeError = false;
     }
-    if(isNaN(this.endLatitude) || this.endLatitude == 0){
+    if(isNaN(this.endLatitude) || this.endLatitude == 0 || Math.abs(this.endLatitude) > 90){
       this.endLatitudeError = true;
       inputError = true;
     } else {
       this.endLatitudeError = false;
     }
-    if(isNaN(this.endLongitude) || this.endLongitude == 0){
+    if(isNaN(this.endLongitude) || this.endLongitude == 0 || Math.abs(this.endLongitude) > 180){
       this.endLongitudeError = true;
       inputError = true;
     } else {
       this.endLongitudeError = false;
     }
-    if(isNaN(this.limit)){
+    if(isNaN(this.limit) || this.limit > 100 || this.limit < 0){
       this.limitError = true;
       inputError = true;
     } else {
       this.limitError = false;
     }
+    console.log(inputError)
     return inputError;
   }
   
