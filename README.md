@@ -1,30 +1,38 @@
-# Elena
+# EleNa
+EleNa is a web-based application for computing a route between two locations. EleNa provides the option to maximize or minimize elevation gain for the route. This implementation is intended to be used as a routing service for users that want a route with minimal or maximum elevation.
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 1.5.5.
 
-## Development server
+## How to install and run EleNa
+1. After cloning, change to any directory in EleNa.
+2. Run `npm install` to install any necessary packages. 
+3. Run `ng serve` to start the application. 
+4. Navigate to `http://localhost:4200/` to use the application.
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+## How to build EleNa
+1. From anywhere in the EleNa directory, run `ng build` to build the project. 
 
-## Code scaffolding
+* The build artifacts will be stored in the `dist/` directory.
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+## Running tests
 
-## Build
+1. Before running any tests, run `ng serve` to start the application. Selenium and Python are required to run some of the tests. Selenium can be installed at http://www.seleniumhq.org/projects/webdriver/ and Python can be installed at https://www.python.org/downloads/.
+2. To test the routing algorithm, open the file 'src/app/options/test_algorithm.html' in a browser window. This will run the tests in 'src/app/options/test_algorithm.js' and show the number of failures.
+3. To test the front-end of the application, run 'python qa/gui/test_ui_validation.py'
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `-prod` flag for a production build.
 
-## Running unit tests
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
 
-## Running end-to-end tests
 
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
 
-## Further help
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+
+
+
+
+
+
+
 
 
 In order to run testing, there is a script in the directory /src/app/options/ called 'test_algorithm.js' which uses the algorithm components to make assertions that the found path has a higher elevation change than the shortest path, and fits within the allotted
@@ -50,8 +58,3 @@ mschiller:gui mschiller$ python test_ui_validation.py
 Ran 21 tests in 106.899s
 
 OK
-
-
-Those should cover the known issues I have encountered when setting up the testing framework.
-
-Also, of course the web-app needs to be running on localhost port 4200.
