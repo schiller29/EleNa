@@ -1,4 +1,8 @@
-//removed vertex labels
+/*global document require*/
+
+var CURRENT_BEST = 0;
+var CURRET_BEST_PL = 0;
+
 
 function vertexObj(vid, lat, long, elev/*, label*/) {
     this.vid = vid;
@@ -939,9 +943,10 @@ Graph.prototype.evolvePopulation = function(population, longestAllowedPath, star
 
         localOptimum = parentGains[parentGains.length - 1].path;
         bestG = parentGains[parentGains.length - 1].g;
-        
+        CURRENT_BEST = bestG;
         //document.writeln("round " + i + " produced a local optimum of:" + this.pathToString(localOptimum));
         document.writeln("with a gain of " + bestG);
+        CURRENT_BEST_PL = this.pathLength(localOptimum);
         document.writeln("and a pathlength of " + this.pathLength(localOptimum));
         document.writeln("");
         document.writeln("");
@@ -957,240 +962,251 @@ Graph.prototype.evolvePopulation = function(population, longestAllowedPath, star
 
 
 
-
+    
 
 
     
     
+// var num_failures = 0;
+// //kept the for loop not visually indented to be easily removed.
+// for(i = 0; i < 10; i++){
+// var graph = new Graph();
 
+// var e = new vertexObj(1, 3, 10, Math.floor((Math.random() * 10)) + 1, "e");
+// graph.addVertexObj(e);
 
-var graph = new Graph();
+// var d = new vertexObj(2, 2, 17, Math.floor((Math.random() * 10)) + 1, "d");
+// graph.addVertexObj(d);
 
-var e = new vertexObj(1, 3, 10, 4, "e");
-graph.addVertexObj(e);
+// var A = new vertexObj(3, 4, 23, Math.floor((Math.random() * 10)) + 1, "A");
+// graph.addVertexObj(A);
 
-var d = new vertexObj(2, 2, 17, 2, "d");
-graph.addVertexObj(d);
+// var f = new vertexObj(4, 5, 5, Math.floor((Math.random() * 10)) + 1, "f");
+// graph.addVertexObj(f);
 
-var A = new vertexObj(3, 4, 23, 0, "A");
-graph.addVertexObj(A);
+// var h = new vertexObj(5, 9, 18, Math.floor((Math.random() * 10)) + 1, "h");
+// graph.addVertexObj(h);
 
-var f = new vertexObj(4, 5, 5, 4, "f");
-graph.addVertexObj(f);
+// var g = new vertexObj(6, 9, 8, Math.floor((Math.random() * 10)) + 1, "g");
+// graph.addVertexObj(g);
 
-var h = new vertexObj(5, 9, 18, 4, "h");
-graph.addVertexObj(h);
+// var T = new vertexObj(7, 14, 11, Math.floor((Math.random() * 10)) + 1, "T");
+// graph.addVertexObj(T);
 
-var g = new vertexObj(6, 9, 8, 3, "g");
-graph.addVertexObj(g);
+// var u = new vertexObj(8, 12, 4, Math.floor((Math.random() * 10)) + 1, "u");
+// graph.addVertexObj(u);
 
-var T = new vertexObj(7, 14, 11, 1, "T");
-graph.addVertexObj(T);
+// var W = new vertexObj(9, 13, 25, Math.floor((Math.random() * 10)) + 1, "W");
+// graph.addVertexObj(W);
 
-var u = new vertexObj(8, 12, 4, 3, "u");
-graph.addVertexObj(u);
+// var l = new vertexObj(10, 15, 28, Math.floor((Math.random() * 10)) + 1, "l");
+// graph.addVertexObj(l);
 
-var W = new vertexObj(9, 13, 25, 5, "W");
-graph.addVertexObj(W);
+// var m = new vertexObj(11, 17, 30, Math.floor((Math.random() * 10)) + 1, "m");
+// graph.addVertexObj(m);
 
-var l = new vertexObj(10, 15, 28, 3, "l");
-graph.addVertexObj(l);
+// var n = new vertexObj(12, 17, 27, Math.floor((Math.random() * 10)) + 1, "n");
+// graph.addVertexObj(n);
 
-var m = new vertexObj(11, 17, 30, 6, "m");
-graph.addVertexObj(m);
+// var U = new vertexObj(13, 16, 25, Math.floor((Math.random() * 10)) + 1, "U");
+// graph.addVertexObj(U);
 
-var n = new vertexObj(12, 17, 27, 2, "n");
-graph.addVertexObj(n);
+// var r = new vertexObj(14, 16, 19, Math.floor((Math.random() * 10)) + 1, "r");
+// graph.addVertexObj(r);
 
-var U = new vertexObj(13, 16, 25, 4, "U");
-graph.addVertexObj(U);
+// var w = new vertexObj(15, 21, 13, Math.floor((Math.random() * 10)) + 1, "w");
+// graph.addVertexObj(w);
 
-var r = new vertexObj(14, 16, 19, 2, "r");
-graph.addVertexObj(r);
+// var v = new vertexObj(16, 21, 5, Math.floor((Math.random() * 10)) + 1, "v");
+// graph.addVertexObj(v);
 
-var w = new vertexObj(15, 21, 13, 1, "w");
-graph.addVertexObj(w);
+// var y = new vertexObj(17, 19, 1, Math.floor((Math.random() * 10)) + 1, "y");
+// graph.addVertexObj(y);
 
-var v = new vertexObj(16, 21, 5, 8, "v");
-graph.addVertexObj(v);
+// var R = new vertexObj(18, 23, 1, Math.floor((Math.random() * 10)) + 1, "R");
+// graph.addVertexObj(R);
 
-var y = new vertexObj(17, 19, 1, 16, "y");
-graph.addVertexObj(y);
+// var Q = new vertexObj(19, 25, 4, Math.floor((Math.random() * 10)) + 1, "Q");
+// graph.addVertexObj(Q);
 
-var R = new vertexObj(18, 23, 1, 27, "R");
-graph.addVertexObj(R);
+// var D = new vertexObj(20, 22, 34, Math.floor((Math.random() * 10)) + 1, "D");
+// graph.addVertexObj(D);
 
-var Q = new vertexObj(19, 25, 4, 26, "Q");
-graph.addVertexObj(Q);
+// var E = new vertexObj(21, 25, 25, Math.floor((Math.random() * 10)) + 1, "E");
+// graph.addVertexObj(E);
 
-var D = new vertexObj(20, 22, 34, 10, "D");
-graph.addVertexObj(D);
+// var X = new vertexObj(22, 29, 18, Math.floor((Math.random() * 10)) + 1, "X");
+// graph.addVertexObj(X);
 
-var E = new vertexObj(21, 25, 25, 4, "E");
-graph.addVertexObj(E);
+// var F = new vertexObj(23, 29, 31, Math.floor((Math.random() * 10)) + 1, "F");
+// graph.addVertexObj(F);
 
-var X = new vertexObj(22, 29, 18, 4, "X");
-graph.addVertexObj(X);
+// var B = new vertexObj(24, 32, 8, Math.floor((Math.random() * 10)) + 1, "B");
+// graph.addVertexObj(B);
 
-var F = new vertexObj(23, 29, 31, 10, "F");
-graph.addVertexObj(F);
+// var P = new vertexObj(25, 33, 10, Math.floor((Math.random() * 10)) + 1, "P");
+// graph.addVertexObj(P);
 
-var B = new vertexObj(24, 32, 8, 4, "B");
-graph.addVertexObj(B);
+// var M = new vertexObj(26, 33, 12, Math.floor((Math.random() * 10)) + 1, "M");
+// graph.addVertexObj(M);
 
-var P = new vertexObj(25, 33, 10, 6, "P");
-graph.addVertexObj(P);
+// var L = new vertexObj(27, 33, 14, Math.floor((Math.random() * 10)) + 1, "L");
+// graph.addVertexObj(L);
 
-var M = new vertexObj(26, 33, 12, 9, "M");
-graph.addVertexObj(M);
+// var N = new vertexObj(28, 31, 12, Math.floor((Math.random() * 10)) + 1, "N");
+// graph.addVertexObj(N);
 
-var L = new vertexObj(27, 33, 14, 6, "L");
-graph.addVertexObj(L);
+// var K = new vertexObj(29, 31, 14, Math.floor((Math.random() * 10)) + 1, "K");
+// graph.addVertexObj(K);
 
-var N = new vertexObj(28, 31, 12, 9, "N");
-graph.addVertexObj(N);
+// var I = new vertexObj(30, 32, 18, Math.floor((Math.random() * 10)) + 1, "I");
+// graph.addVertexObj(I);
 
-var K = new vertexObj(29, 31, 14, 7, "K");
-graph.addVertexObj(K);
+// var H = new vertexObj(31, 32, 28, Math.floor((Math.random() * 10)) + 1, "H");
+// graph.addVertexObj(H);
 
-var I = new vertexObj(30, 32, 18, 10, "I");
-graph.addVertexObj(I);
+// var G = new vertexObj(32, 35, 30, Math.floor((Math.random() * 10)) + 1, "G");
+// graph.addVertexObj(G);
 
-var H = new vertexObj(31, 32, 28, 13, "H");
-graph.addVertexObj(H);
+// var J = new vertexObj(33, 37, 17, Math.floor((Math.random() * 10)) + 1, "J");
+// graph.addVertexObj(J);
 
-var G = new vertexObj(32, 35, 30, 18, "G");
-graph.addVertexObj(G);
 
-var J = new vertexObj(33, 37, 17, 8, "J");
-graph.addVertexObj(J);
+// graph.addEdge(f, e, 2);
+// graph.addEdge(f, u, 3);
+// graph.addEdge(f, g, 2);
 
+// graph.addEdge(e, g, 3);
+// graph.addEdge(e, d, 3);
 
-graph.addEdge(f, e, 2);
-graph.addEdge(f, u, 3);
-graph.addEdge(f, g, 2);
+// graph.addEdge(d, A, 3);
+// graph.addEdge(d, h, 3);
 
-graph.addEdge(e, g, 3);
-graph.addEdge(e, d, 3);
+// graph.addEdge(T, g, 3);
+// graph.addEdge(T, w, 4);
+// graph.addEdge(T, h, 5);
 
-graph.addEdge(d, A, 3);
-graph.addEdge(d, h, 3);
-
-graph.addEdge(T, g, 3);
-graph.addEdge(T, w, 4);
-graph.addEdge(T, h, 5);
-
-graph.addEdge(v, u, 6);
-graph.addEdge(v, y, 2);
-graph.addEdge(v, w, 5);
-graph.addEdge(v, P, 8);
-
-graph.addEdge(w, u, 7);
-graph.addEdge(w, r, 4);
-graph.addEdge(w, N, 6);
-
-graph.addEdge(r, h, 4);
-graph.addEdge(r, A, 7);
-graph.addEdge(r, U, 3);
-
-graph.addEdge(W, A, 4);
-graph.addEdge(W, U, 2);
-graph.addEdge(W, l, 2);
-
-graph.addEdge(n, U, 1);
-graph.addEdge(n, l, 1);
-graph.addEdge(n, m, 1);
-graph.addEdge(n, E, 4);
-
-graph.addEdge(l, m, 1);
-
-graph.addEdge(D, m, 3);
-
-graph.addEdge(E, m, 5);
-graph.addEdge(E, D, 5);
-graph.addEdge(E, X, 4);
-
-graph.addEdge(F, D, 5);
-graph.addEdge(F, I, 7);
-graph.addEdge(F, H, 2);
-graph.addEdge(F, G, 3);
-
-graph.addEdge(N, U, 12);
-graph.addEdge(N, K, 1);
-graph.addEdge(N, M, 1);
-
-graph.addEdge(H, G, 2);
-graph.addEdge(H, I, 5);
-
-graph.addEdge(J, I, 3);
-graph.addEdge(J, G, 7);
-graph.addEdge(J, P, 5);
-
-graph.addEdge(L, M, 1);
-graph.addEdge(L, K, 1);
-graph.addEdge(L, I, 2);
-graph.addEdge(L, X, 2);
-
-graph.addEdge(M, P, 1);
-
-graph.addEdge(K, X, 2);
-
-graph.addEdge(B, P, 1);
-graph.addEdge(B, Q, 4);
-graph.addEdge(B, R, 6);
-
-graph.addEdge(R, Q, 2);
-graph.addEdge(R, y, 2);
-
-graph.addEdge(y, Q, 3);
-
-
-var start = K;
-var end = f;
-//graph.dijkstra(start,end);
-
-//graph.astar(start,end);
-var bfn = graph.populateMidline(start,end);
-//for(var i = 0; i < bfn.length; i++) {
-//    document.writeln("best fit node " + bfn[i].label);
-//}
-var xPercent = 150;
-//var shortestPathDist = graph.dijkstra(start,end);
-var shortestPathDist = graph.astar(start,end);
-
-var shortestDist = shortestPathDist.d;
-var longestAllowedPath = shortestDist * (xPercent / 100);
-
-//??why did i design this to also return lap??
-var poplap = graph.generateInitialPopulation(start,end,bfn,longestAllowedPath);
-var pop = poplap.pop;
-var lap = poplap.lap;
-
-//var gain = graph.elevGainOf(pop[4]);
-//document.writeln("gain is: " + gain);
-//var elevGains = graph.getElevGains(pop);
-//for(var i = 0; i < elevGains.length; i++) {
-//    document.writeln("elev gain of path: " + graph.pathToString(elevGains[i].path) + " is " + elevGains[i].g);
-//}
-//document.writeln("");
-//var parentGains = elevGains.sort(function(P, Q) { //sort paths by gain
-//                                               return P.g - Q.g;
-//                                               });
-//for(var i = 0; i < parentGains.length; i++) {
-//    document.writeln("elev gain of path: " + graph.pathToString(parentGains[i].path) + " is " + parentGains[i].g);
-//}
-//var parentList = graph.replicate(parentGains);
-//var pairs = graph.formPairs(parentList);
-//document.writeln("longest allowed path is : " + lap);
-//var children = graph.crossover(pathdist.path, pathdist.path, lap, A, B);
-//document.writeln("last diff between :");
-//document.writeln("and");
-//document.writeln("is at index " + x.ldP + " in 1st path and " + x.ldQ + " in 2nd path");
-//document.writeln("crossover points are " + thepoints.sPos + " and " + thepoints.tPos);
-//document.writeln("child is: " + graph.pathToString(child));
-
-
-graph.evolvePopulation(pop, lap, start, end);
-document.writeln("compared to gain of shortest path, which is " + graph.elevGainOf(shortestPathDist.path));
-//document.writeln("and has a path of " + graph.pathToString(graph.dijkstra(start,end).path));
-
+// graph.addEdge(v, u, 6);
+// graph.addEdge(v, y, 2);
+// graph.addEdge(v, w, 5);
+// graph.addEdge(v, P, 8);
+
+// graph.addEdge(w, u, 7);
+// graph.addEdge(w, r, 4);
+// graph.addEdge(w, N, 6);
+
+// graph.addEdge(r, h, 4);
+// graph.addEdge(r, A, 7);
+// graph.addEdge(r, U, 3);
+
+// graph.addEdge(W, A, 4);
+// graph.addEdge(W, U, 2);
+// graph.addEdge(W, l, 2);
+
+// graph.addEdge(n, U, 1);
+// graph.addEdge(n, l, 1);
+// graph.addEdge(n, m, 1);
+// graph.addEdge(n, E, 4);
+
+// graph.addEdge(l, m, 1);
+
+// graph.addEdge(D, m, 3);
+
+// graph.addEdge(E, m, 5);
+// graph.addEdge(E, D, 5);
+// graph.addEdge(E, X, 4);
+
+// graph.addEdge(F, D, 5);
+// graph.addEdge(F, I, 7);
+// graph.addEdge(F, H, 2);
+// graph.addEdge(F, G, 3);
+
+// graph.addEdge(N, U, 12);
+// graph.addEdge(N, K, 1);
+// graph.addEdge(N, M, 1);
+
+// graph.addEdge(H, G, 2);
+// graph.addEdge(H, I, 5);
+
+// graph.addEdge(J, I, 3);
+// graph.addEdge(J, G, 7);
+// graph.addEdge(J, P, 5);
+
+// graph.addEdge(L, M, 1);
+// graph.addEdge(L, K, 1);
+// graph.addEdge(L, I, 2);
+// graph.addEdge(L, X, 2);
+
+// graph.addEdge(M, P, 1);
+
+// graph.addEdge(K, X, 2);
+
+// graph.addEdge(B, P, 1);
+// graph.addEdge(B, Q, 4);
+// graph.addEdge(B, R, 6);
+
+// graph.addEdge(R, Q, 2);
+// graph.addEdge(R, y, 2);
+
+// graph.addEdge(y, Q, 3);
+
+
+// var start = K;
+// var end = f;
+// //graph.dijkstra(start,end);
+
+// //graph.astar(start,end);
+// var bfn = graph.populateMidline(start,end);
+// //for(var i = 0; i < bfn.length; i++) {
+// //    document.writeln("best fit node " + bfn[i].label);
+// //}
+// var xPercent = 200;
+// //var shortestPathDist = graph.dijkstra(start,end);
+// var shortestPathDist = graph.astar(start,end);
+
+// var shortestDist = shortestPathDist.d;
+// var longestAllowedPath = shortestDist * (xPercent / 100);
+
+// //??why did i design this to also return lap??
+// var poplap = graph.generateInitialPopulation(start,end,bfn,longestAllowedPath);
+// var pop = poplap.pop;
+// var lap = poplap.lap;
+
+// //var gain = graph.elevGainOf(pop[4]);
+// //document.writeln("gain is: " + gain);
+// //var elevGains = graph.getElevGains(pop);
+// //for(var i = 0; i < elevGains.length; i++) {
+// //    document.writeln("elev gain of path: " + graph.pathToString(elevGains[i].path) + " is " + elevGains[i].g);
+// //}
+// //document.writeln("");
+// //var parentGains = elevGains.sort(function(P, Q) { //sort paths by gain
+// //                                               return P.g - Q.g;
+// //                                               });
+// //for(var i = 0; i < parentGains.length; i++) {
+// //    document.writeln("elev gain of path: " + graph.pathToString(parentGains[i].path) + " is " + parentGains[i].g);
+// //}
+// //var parentList = graph.replicate(parentGains);
+// //var pairs = graph.formPairs(parentList);
+// //document.writeln("longest allowed path is : " + lap);
+// //var children = graph.crossover(pathdist.path, pathdist.path, lap, A, B);
+// //document.writeln("last diff between :");
+// //document.writeln("and");
+// //document.writeln("is at index " + x.ldP + " in 1st path and " + x.ldQ + " in 2nd path");
+// //document.writeln("crossover points are " + thepoints.sPos + " and " + thepoints.tPos);
+// //document.writeln("child is: " + graph.pathToString(child));
+
+// var assert = function(condition, message) { 
+//     if (!condition){
+//         throw Error("Assert failed" + (typeof message !== "undefined" ? ": " + message : ""));
+//         num_failures++;
+//     }
+// };
+
+// graph.evolvePopulation(pop, lap, start, end);
+// assert(CURRENT_BEST >= graph.elevGainOf(shortestPathDist.path), "The found path was better performance than shortes path");
+// assert(CURRENT_BEST_PL <= longestAllowedPath);
+// document.writeln("compared to gain of shortest path, which is " + graph.elevGainOf(shortestPathDist.path));
+// //document.writeln("and has a path of " + graph.pathToString(graph.dijkstra(start,end).path));
+// }
+
+// document.writeln('The number of failures were: ' + num_failures);

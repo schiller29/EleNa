@@ -142,7 +142,7 @@ export class OptionsComponent implements OnInit {
     } else {
       this.endLongitudeError = false;
     }
-    if(isNaN(this.limit) || this.limit > 100 || this.limit < 0){
+    if(isNaN(this.limit) || this.limit > 1000 || this.limit < 0){
       this.limitError = true;
       inputError = true;
     } else {
