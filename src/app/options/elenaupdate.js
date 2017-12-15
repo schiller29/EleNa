@@ -271,6 +271,7 @@ Graph.prototype.dijkstra = function(A, B) {
 
  
 
+<<<<<<< HEAD
 
 
 Graph.prototype.astar = function(start, end) {
@@ -420,6 +421,8 @@ Graph.prototype.astar = function(start, end) {
 
 
 
+=======
+>>>>>>> 72f8afa04bf0678162954dbc9b040f327a772b82
 //don't worry, i'll fix the lack of modularity
 Graph.prototype.populateMidline = function(A, B) {
     var rise = B.lat - A.lat;  //sign doesnt matter, because will take its absolute value later
@@ -545,12 +548,17 @@ Graph.prototype.generateInitialPopulation = function(A, B, bestFitNodes, lap) {
     var pathPopulation = [] //holds the paths thru each of the midNodes (it is a list of lists)
     for(var i = 0; i < bestFitNodes.length; i++) {
         var midNode = bestFitNodes[i];
+<<<<<<< HEAD
         //var pathD1 = this.dijkstra(A, midNode);
         var pathD1 = this.astar(A, midNode);
 
         //var pathD2 = this.dijkstra(midNode, B);
         var pathD2 = this.astar(midNode, B);
 
+=======
+        var pathD1 = this.dijkstra(A, midNode);
+        var pathD2 = this.dijkstra(midNode, B);
+>>>>>>> 72f8afa04bf0678162954dbc9b040f327a772b82
         //check if path has repeated nodes (not including midNode, of course)
         //and
         //check if this individual is short enough to be member of initial population
@@ -814,9 +822,13 @@ Graph.prototype.generateChild = function(path1, path2, lap, A, B) {
         if ((path_A_to_s[path_A_to_s.length-1].vid) == (path_t_to_B[0].vid))
             document.writeln("successfully passed s == t edgecase");
 
+<<<<<<< HEAD
         //s_to_t = this.dijkstra(path1[crosspoints.sPos], path2[crosspoints.tPos]);
         s_to_t = this.astar(path1[crosspoints.sPos], path2[crosspoints.tPos]);
 
+=======
+        s_to_t = this.dijkstra(path1[crosspoints.sPos], path2[crosspoints.tPos]);
+>>>>>>> 72f8afa04bf0678162954dbc9b040f327a772b82
         path_s_to_t = s_to_t.path;
         dist_s_to_t = s_to_t.d;
         
@@ -1154,8 +1166,12 @@ var bfn = graph.populateMidline(start,end);
 //    document.writeln("best fit node " + bfn[i].label);
 //}
 var xPercent = 150;
+<<<<<<< HEAD
 //var shortestPathDist = graph.dijkstra(start,end);
 var shortestPathDist = graph.astar(start,end);
+=======
+var shortestPathDist = graph.dijkstra(start,end);
+>>>>>>> 72f8afa04bf0678162954dbc9b040f327a772b82
 
 var shortestDist = shortestPathDist.d;
 var longestAllowedPath = shortestDist * (xPercent / 100);
