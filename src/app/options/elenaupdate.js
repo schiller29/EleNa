@@ -556,8 +556,8 @@ Graph.prototype.generateInitialPopulation = function(A, B, bestFitNodes, lap) {
         var pathD2 = this.astar(midNode, B);
 
 =======
-        var pathD1 = this.dijkstra(A, midNode);
-        var pathD2 = this.dijkstra(midNode, B);
+        //var pathD1 = this.dijkstra(A, midNode);
+        //var pathD2 = this.dijkstra(midNode, B);
 >>>>>>> 72f8afa04bf0678162954dbc9b040f327a772b82
         //check if path has repeated nodes (not including midNode, of course)
         //and
@@ -827,7 +827,6 @@ Graph.prototype.generateChild = function(path1, path2, lap, A, B) {
         s_to_t = this.astar(path1[crosspoints.sPos], path2[crosspoints.tPos]);
 
 =======
-        s_to_t = this.dijkstra(path1[crosspoints.sPos], path2[crosspoints.tPos]);
 >>>>>>> 72f8afa04bf0678162954dbc9b040f327a772b82
         path_s_to_t = s_to_t.path;
         dist_s_to_t = s_to_t.d;
