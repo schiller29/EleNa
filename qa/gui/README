@@ -1,0 +1,27 @@
+In general, the tests pertain mainly to the front-end since the algortihm was
+not plugged into the front-end until closer to the deadline due to the complexity
+of developing the project and integrating the systems.
+
+Anyways, running the tests are fairly simple. Chromedriver should be able to run
+on Unix based systems or Windows. It is used to integrate between selenium and
+newer browsers. If selenium is not installed yet, got to http://www.seleniumhq.org/projects/webdriver/
+and install the appropriate dependencies. Once installed, the selenium import statements should be
+working. Running the tests are simple:
+
+python test_ui_validation.py
+
+
+
+The output should look something like this: 
+
+mschiller:gui mschiller$ python test_ui_validation.py
+.....................
+----------------------------------------------------------------------
+Ran 21 tests in 106.899s
+
+OK
+
+
+Those should cover the known issues I have encountered when setting up the testing framework.
+
+Also, of course the web-app needs to be running on localhost port 4200.

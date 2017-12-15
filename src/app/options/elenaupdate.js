@@ -271,6 +271,155 @@ Graph.prototype.dijkstra = function(A, B) {
 
  
 
+
+
+Graph.prototype.astar = function(start, end) {
+    if(!this.vertices[start.vid]) {
+        return document.writeln('Vertex not found');
+    }
+    
+    //changing open and closed to have their indices correspond to the vid's of the vertexObj's in this.vertices
+    //edge case, A == B
+    if (start.vid == end.vid) {
+        document.writeln("start == end. dist is 0");
+        return {"path":[start], "d":0};
+    }
+    
+    var open = [];
+    open.push(start);
+    var openF = [];  //distances of elements in open. contains (the known distance from start to that node, plus the estimated distance from that node to end node) of vertex with position i within open at position i within openF
+    var closed = [];  //"visited"
+    var shortestDistsFromA = [];  //ith entry contains shortest distance from vertexStart to the vertex with vid == i
+    var distsToB = [];  //ith entry holds the as-the-crow-flies distance from the ith vertex of this.vertices to B
+    var estDistAtoB = []; //ith entry holds the f value for vertex with index i within this.vertices
+    
+    //initialize the shortest distance and the estDistAtoB to every vertex to Infinity
+    for (var i = 0; i < this.vertices.length; i++) {
+        if (this.vertices[i])  {//if the vertex exists
+            shortestDistsFromA[i] = Infinity;
+            estDistAtoB[i] = Infinity;
+        }
+    }
+    
+    //but assign 0 as the shortest distance to startVertex
+    shortestDistsFromA[start.vid] = 0;
+    
+    var V;
+    //populate distsToB with the h values for each vertex
+    //NOTE: given our program will be operating on many vertex graphs, it might be cheaper to calculate hx as we go, instead of all at once in the beginning.
+    for (var i = 0; i < this.vertices.length; i++) {
+        if (this.vertices[i])  {//if the vertex exists
+            V = this.vertices[i];
+            distsToB[i] = Math.sqrt(Math.pow(V.lat - end.lat, 2) + Math.pow(V.long - end.long, 2));
+        }
+    }
+    
+    
+    //is THIS the problem. should be a-t-c-f dist from start to end, not 0 (dist from start to start = 0, and dist from start to end = diststarttoend)
+    estDistAtoB[start.vid] = distsToB[start.vid];
+
+    var parents = [];  //ith entry contains vid of parent of vertex whose vid == i
+    var gx;  //"g(x)" = distance from startVertex to a given vertex
+    var hx; //"h(x)" = estimated distance from given vertex to B
+    
+    var fx;  //"f(x)" = g(x) + h(x) = estimated distance from A to B (the heuristic of a* search)
+    var vertexObj;
+    var minDistOfOpenF;
+    var Vid;
+    var neighborVid;
+    var distToNeighbor;
+    var visitCounter = 0; //to compare performance with Dijkstra
+    
+    //open and openF are designed to always maintain the same indices. index i of vertex V in open has its shortest distance recorded at index i of openF
+    
+    while (open.length) {
+        //set vertexObj to the vertex in open with shortest known distance from A
+        openF = [];
+        for(var i = 0; i < open.length; i++) {
+            openF[i] = estDistAtoB[open[i].vid];  //populate shortest distances of open list
+            
+        }
+        
+        //assign vertexObj to the vertex in open with shortest distance From A
+        minDistOfOpenF = Math.min.apply(null, openF);  //smallest distance in openD
+        
+        Vid = estDistAtoB.indexOf(minDistOfOpenF);  //vertex that has this minDist has position Vid in shortestDistsFromA...
+        //BUT have to make sure the vertex with this min distance hasnt yet been visited, bc it could could be tied for the min distance with a vertex that has already been visited, and which also occurs earlier in the list, thus always being chosen even though it should never have been chosen again
+        while (~indexOfVertex(Vid, closed)) {  //keep calculating a new Vid until arrive at one that has not yet been visited (while its in closed)
+            Vid = estDistAtoB.indexOf(minDistOfOpenF, Vid + 1);  //check Vid's starting at position after the current position
+        }
+        visitCounter++;
+        //...and therefore the same position within this.vertices
+        vertexObj = this.vertices[Vid];
+        
+        closed.push(vertexObj);  //???does it matter if close it here instead of after calculating fx for each of its neighbors???
+        open.splice(indexOfVertex(vertexObj.vid, open), 1); //remove from open
+        //remove it from openF as well
+        openF.splice(indexOfVertex(vertexObj.vid, open), 1);
+        
+        //ISNT VISITING ITS LAST NEIGHBOR
+        for(var i = 0; i < this.edges[vertexObj.vid].length; i++) {
+            //if neighbor is unvisited
+            neighborVid = this.edges[vertexObj.vid][i].vid;
+            neighborV = this.vertices[neighborVid];
+            
+            distToNeighbor = this.edges[vertexObj.vid][i].d;
+            if (!~indexOfVertex(neighborVid,closed)) {  //if neighbor has not yet been visited
+                
+                //make sure its not already in open before adding it
+                //??i have the feeling i can avoid performing this check. eh, maybe not??
+                if (!~indexOfVertex(neighborVid,open)) {
+                    open.push(neighborV);
+                }
+                
+                
+                gx = shortestDistsFromA[vertexObj.vid] + distToNeighbor;
+                //??check if both gx and fx are less than current values??
+                //if gx is less than current shortest dist, then update gx and parent
+                if (gx < shortestDistsFromA[neighborVid]) {
+                    //update shortest distance from A to that neighbor
+                    shortestDistsFromA[neighborVid] = gx;
+                    
+                    //and update the neighbor's parent
+                    parents[neighborVid] = vertexObj.vid;
+                    
+                    //??if gx didnt decrease, then fx wont increase either, bc hx is constant. so only need to update fx from within this if-block?? and dont need to check again if it decreased, just go ahead and update it??
+                    hx = distsToB[neighborVid];
+                    fx = gx + hx;
+                    estDistAtoB[neighborVid] = fx;
+                }
+                
+                if (neighborVid == end.vid) {
+                    //have found B, so can stop searching and return this path (its length is given by gx
+                    //obtain shortest path from A to B
+                    vertexObj = end;
+                    path = [vertexObj];
+                    
+                    while (parents[vertexObj.vid] != start.vid) {
+                        
+                        
+                        parent = this.vertices[parents[vertexObj.vid]];
+                        path.unshift(parent); //add parent vertexObj to head of path
+                        vertexObj = this.vertices[parents[vertexObj.vid]];
+                    }
+                    
+                    //dont forget to add A at the end
+                    parent = this.vertices[parents[vertexObj.vid]];
+                    path.unshift(parent);
+                    
+                    //actually, need to return both the path itself as well as its length, so return an object
+                    
+                    return {"path":path, "d":gx};
+                }
+            }
+        }
+    }
+}
+
+
+
+
+
 //don't worry, i'll fix the lack of modularity
 Graph.prototype.populateMidline = function(A, B) {
     var rise = B.lat - A.lat;  //sign doesnt matter, because will take its absolute value later
@@ -396,8 +545,12 @@ Graph.prototype.generateInitialPopulation = function(A, B, bestFitNodes, lap) {
     var pathPopulation = [] //holds the paths thru each of the midNodes (it is a list of lists)
     for(var i = 0; i < bestFitNodes.length; i++) {
         var midNode = bestFitNodes[i];
-        var pathD1 = this.dijkstra(A, midNode);
-        var pathD2 = this.dijkstra(midNode, B);
+        //var pathD1 = this.dijkstra(A, midNode);
+        var pathD1 = this.astar(A, midNode);
+
+        //var pathD2 = this.dijkstra(midNode, B);
+        var pathD2 = this.astar(midNode, B);
+
         //check if path has repeated nodes (not including midNode, of course)
         //and
         //check if this individual is short enough to be member of initial population
@@ -661,7 +814,9 @@ Graph.prototype.generateChild = function(path1, path2, lap, A, B) {
         if ((path_A_to_s[path_A_to_s.length-1].vid) == (path_t_to_B[0].vid))
             document.writeln("successfully passed s == t edgecase");
 
-        s_to_t = this.dijkstra(path1[crosspoints.sPos], path2[crosspoints.tPos]);
+        //s_to_t = this.dijkstra(path1[crosspoints.sPos], path2[crosspoints.tPos]);
+        s_to_t = this.astar(path1[crosspoints.sPos], path2[crosspoints.tPos]);
+
         path_s_to_t = s_to_t.path;
         dist_s_to_t = s_to_t.d;
         
@@ -999,7 +1154,8 @@ var bfn = graph.populateMidline(start,end);
 //    document.writeln("best fit node " + bfn[i].label);
 //}
 var xPercent = 150;
-var shortestPathDist = graph.dijkstra(start,end);
+//var shortestPathDist = graph.dijkstra(start,end);
+var shortestPathDist = graph.astar(start,end);
 
 var shortestDist = shortestPathDist.d;
 var longestAllowedPath = shortestDist * (xPercent / 100);

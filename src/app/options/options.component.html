@@ -3,17 +3,17 @@
     <h4>Additional Options</h4>
     <div>
         <label>Maximize Elevation Gain:
-          <input [(ngModel)]="maximizeElevation" placeholder="maximize" type="checkbox" (change)="elevationClick('maximize')" >
+          <input [(ngModel)]="maximizeElevation" id="maximize" placeholder="maximize" type="checkbox" (change)="elevationClick('maximize')" >
         </label>
     </div>
     <div>
         <label>Minimize Elevation Gain:
-          <input [(ngModel)]="minimizeElevation" placeholder="minimize" type="checkbox" (change)="elevationClick('minimize')" >
+          <input [(ngModel)]="minimizeElevation" id="minimize" placeholder="minimize" type="checkbox" (change)="elevationClick('minimize')" >
         </label>
     </div>  
     <div>
         <label>Limit on Total Distance:
-          <input [(ngModel)]="limit" placeholder="percentage">
+          <input [(ngModel)]="limit" id="limit" placeholder="percentage">
         </label>
     </div>
     <br>
@@ -37,6 +37,6 @@
     <h5>Please enter a valid value for</h5>
   </div>
   <div class="app-modal-body">
-    <p>{{errorText}}</p>
+    <p id="errorText">{{errorText}}</p>
   </div>
 </app-modal>
