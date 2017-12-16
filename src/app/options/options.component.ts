@@ -56,7 +56,8 @@ export class OptionsComponent implements OnInit {
   mapRoute: boolean;
 
   errorText: string;
-  @ViewChild('modal') modal: ModalComponent;
+  @ViewChild('modalInputError') modalInputError: ModalComponent; //Modal dialog for bad user input
+  @ViewChild('modalAppFailure') modalAppFailure: ModalComponent; //Modal dialog for routing failure
 
   busy: Subscription;
 
@@ -91,7 +92,7 @@ export class OptionsComponent implements OnInit {
       this.mapRoute = false;
       this.buttonText = 'Route';
       this.errorText = this.generateErrorText();
-      this.modal.show();  
+      this.modalInputError.show();  
     }
   }
 
@@ -184,19 +185,28 @@ export class OptionsComponent implements OnInit {
 
   loadData(minLat, minLong, maxLat, maxLong) {
     this.busy = this.locationService.getNodes(minLat, minLong, maxLat, maxLong)
-      .subscribe(data => {
-        this.nodeList = data.elements;
-        console.log(this.nodeList);
-        console.log('intersecting nodes loaded');
-        console.log('loading way data');
-        this.locationService.getWays(minLat, minLong, maxLat, maxLong)
-          .subscribe(data => {
-            this.wayList = data.elements;
-            console.log(this.wayList);
-            console.log('way data loaded');
-            this.populateLists();
-          })
-    })
+      .subscribe(
+        data => {
+          this.nodeList = data.elements;
+          console.log(this.nodeList);
+          console.log('intersecting nodes loaded');
+          console.log('loading way data');
+          this.locationService.getWays(minLat, minLong, maxLat, maxLong)
+            .subscribe(
+              data => {
+                this.wayList = data.elements;
+                console.log(this.wayList);
+                console.log('way data loaded');
+                this.populateLists();
+              },
+              error => {
+                console.log("Caught Error!!!")
+            });
+        }, 
+        error => {
+          console.log("Caught error!!")
+        }
+      );
   }
 
   populateEdges() {
@@ -261,12 +271,17 @@ export class OptionsComponent implements OnInit {
     console.log(this.intersectingNodes);
     console.log(this.latlonList);
     this.locationService.getLocation(this.latlonList)
-      .subscribe(data => {
-        this.location = data.results;
-        console.log(this.location);
-        this.populateVertices();
-        this.populateEdges();
-      })
+      .subscribe(
+        data => {
+          this.location = data.results;
+          console.log(this.location);
+          this.populateVertices();
+          this.populateEdges();
+        },
+        error => {
+          this.modalAppFailure.show();  
+        }
+      )
   }
 
   populateVertices() {
@@ -286,19 +301,6 @@ export class OptionsComponent implements OnInit {
     this.buttonText = 'Re-route';
     console.log('printed vertices');
   }
-
-  // needs rewriting
-  // loadLocations(sLatitude, sLongitude, eLatitude, eLongitude) {
-  //   this.locationService.getLocation(sLatitude, sLongitude)
-  //     .subscribe(data => {
-  //       this.startLocation = data;
-  //       this.locationService.getLocation(eLatitude, eLongitude)
-  //         .subscribe(data => {
-  //           this.endLocation = data;
-  //           this.startRoute(sLatitude, sLongitude, eLatitude, eLongitude);
-  //         });
-  //     });
-  // }
 
   loadLocations(sLatitude, sLongitude, eLatitude, eLongitude) {
     this.startRoute(sLatitude, sLongitude, eLatitude, eLongitude);
