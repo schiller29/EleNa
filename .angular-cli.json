@@ -24,7 +24,8 @@
         "../node_modules/openlayers/dist/ol.css"
       ],
       "scripts": [
-        "../node_modules/openlayers/dist/ol.js"
+        "../node_modules/openlayers/dist/ol.js",
+        "../src/app/options/elenaupdate.js"
       ],
       "environmentSource": "environments/environment.ts",
       "environments": {

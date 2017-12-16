@@ -8,7 +8,9 @@ import { Edge } from '../models/edge';
 import { LatLon } from '../models/latlon';
 import { LocationService } from '../services/location.service';
 import { ModalComponent } from '../modal/modal.component';
-import { HaversineService, GeoCoord } from "ng2-haversine";
+import { HaversineService, GeoCoord } from 'ng2-haversine';
+
+declare var evolver: any;
 
 @Component({
   selector: 'app-options',
@@ -25,6 +27,9 @@ export class OptionsComponent implements OnInit {
   edges: any[] = [];
   location: Location[];
   latlonList: LatLon[] = [];
+
+  startEndLatLonList: LatLon[] = [];
+  startEndLocation: Location[];
 
   intersectingNodes: number[] = [];
 
@@ -156,6 +161,34 @@ export class OptionsComponent implements OnInit {
     console.log("Maximize: " + this.maximizeElevation);
     console.log("Minimize: " + this.minimizeElevation);
     console.log("Limit: " + this.limit);
+    let startLatLon: LatLon = {
+      lat: sLatitude,
+      lon: sLongitude
+    };
+    this.startEndLatLonList.push(startLatLon);
+    let endLatLon: LatLon = {
+      lat: eLatitude,
+      lon: eLongitude
+    };
+    this.startEndLatLonList.push(endLatLon);
+    this.locationService.getLocation(this.startEndLatLonList)
+      .subscribe(data => {
+        this.startEndLocation = data.results;
+        let startVertex: Vertex = {
+          vid: 0,
+          lat: sLatitude,
+          long: sLongitude,
+          elev: this.startEndLocation[0].elevation
+        };
+        let endVertex: Vertex = {
+          vid: 1,
+          lat: eLatitude,
+          long: eLongitude,
+          elev: this.startEndLocation[1].elevation
+        };
+        this.vertices.push(startVertex);
+        this.vertices.push(endVertex);
+      })
     if(sLatitude > eLatitude){
       var minLat = eLatitude;
       var maxLat = sLatitude;
@@ -176,6 +209,8 @@ export class OptionsComponent implements OnInit {
     this.loadData(minLat, minLong, maxLat, maxLong);
   }
 
+  // this will parse through the data received from the API to populate the 
+  // vertices and edges lists, which are required by the algorithm
   loadData(minLat, minLong, maxLat, maxLong) {
     this.locationService.getNodes(minLat, minLong, maxLat, maxLong)
       .subscribe(data => {
@@ -193,6 +228,7 @@ export class OptionsComponent implements OnInit {
     })
   }
 
+  // populates the edges lists with data from API
   populateEdges() {
     this.nodeList.forEach(node => {
       let edgeArr: Edge[] = [];
@@ -212,6 +248,7 @@ export class OptionsComponent implements OnInit {
     console.log('printed edges');
   }
 
+  // populates the inner list of edges
   populateInnerEdge(sid, eid, edgeArr, uniqueEdges) {
     let start: GeoCoord = {latitude: 0, longitude: 0};
     let end: GeoCoord = {latitude: 0, longitude: 0};
@@ -243,6 +280,7 @@ export class OptionsComponent implements OnInit {
     }
   }
 
+  // will populate vertices and edges
   populateLists() {
     this.nodeList.forEach(element => {
       this.intersectingNodes.push(element.id);
@@ -260,11 +298,13 @@ export class OptionsComponent implements OnInit {
         console.log(this.location);
         this.populateVertices();
         this.populateEdges();
+        evolver(this.vertices,this.edges,true,this.limit);
       })
   }
 
+  // populates the vertices list
   populateVertices() {
-    let count = 0;
+    let count = 2;
     this.location.forEach(element => {
       let vertex: Vertex = {
         vid: count,
@@ -280,19 +320,6 @@ export class OptionsComponent implements OnInit {
     this.buttonText = 'Re-route';
     console.log('printed vertices');
   }
-
-  // needs rewriting
-  // loadLocations(sLatitude, sLongitude, eLatitude, eLongitude) {
-  //   this.locationService.getLocation(sLatitude, sLongitude)
-  //     .subscribe(data => {
-  //       this.startLocation = data;
-  //       this.locationService.getLocation(eLatitude, eLongitude)
-  //         .subscribe(data => {
-  //           this.endLocation = data;
-  //           this.startRoute(sLatitude, sLongitude, eLatitude, eLongitude);
-  //         });
-  //     });
-  // }
 
   loadLocations(sLatitude, sLongitude, eLatitude, eLongitude) {
     this.startRoute(sLatitude, sLongitude, eLatitude, eLongitude);

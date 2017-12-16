@@ -17,6 +17,7 @@ export class LocationService {
 
   OVERPASS_INTERSECTION_QUERY = ');)->.n1;foreach.n1((.n1;%20-%20._;)->.n2;node(w._)->.n3;node(w.n2)->.n2;node.n3.n2;out;);';
 
+  // gets elevation data from API
   getLocation(latlonList) {
     let LATLON = '';
     latlonList.forEach(element => {
@@ -27,11 +28,13 @@ export class LocationService {
     .map((res:Response) => res.json());
   }
 
+  // gets all intersection from API
   getNodes(minLat, minLong, maxLat, maxLong) {
     return this.http.get(this.OVERPASS_INTERSECTION_URL+minLat+","+minLong+","+maxLat+","+maxLong+this.OVERPASS_INTERSECTION_QUERY)
     .map((res:Response) => res.json());
   }
 
+  // gets all ways from API
   getWays(minLat, minLong, maxLat, maxLong) {
     return this.http.get(this.OVERPASS_WAY_URL+minLat+","+minLong+","+maxLat+","+maxLong+");out%20meta;")
     .map((res:Response) => res.json());

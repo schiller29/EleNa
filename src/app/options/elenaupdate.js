@@ -4,6 +4,29 @@ var CURRENT_BEST = 0;
 var CURRET_BEST_PL = 0;
 
 
+function evolver(vertices, edges, maxOrMin, xPercent) {
+    var graphx = new Graph();
+    graphx.edges = edges;
+    graphx.vertices = vertices;
+    
+    var start = graphx.vertices[0];
+    var end = graphx.vertices[1];
+    var points = graphx.populateMidline(start,end);
+    var bfn = graphx.fitNodesToMidline(points);
+    
+    var shortestPathDist = graphx.astar(start,end);
+    var shortestDist = shortestPathDist.d;
+    var longestAllowedPath = shortestDist * (xPercent / 100);
+    var pop = graphx.generateInitialPopulation(start,end,bfn, longestAllowedPath);
+    
+    document.writeln("lap is " + longestAllowedPath);
+    
+        
+    var o = graphx.evolvePopulation(pop, longestAllowedPath, start, end, maxOrMin);
+    document.writeln("compared to gain of shortest path, which is " + graphx.elevGainOf(shortestPathDist.path));
+    document.writeln("and has a path of " + graphx.pathToString(graphx.astar(start,end).path));
+}
+
 function vertexObj(vid, lat, long, elev/*, label*/) {
     this.vid = vid;
     this.lat = lat;
@@ -424,17 +447,14 @@ Graph.prototype.astar = function(start, end) {
 
 
 
-//don't worry, i'll fix the lack of modularity
+//populate the midline between A and B with
 Graph.prototype.populateMidline = function(A, B) {
     var rise = B.lat - A.lat;  //sign doesnt matter, because will take its absolute value later
     var run = B.long - A.long;
-
     //remember to handle edge case where A and B have same longitude (avoid divide by 0)
     var origPos = rise/run > 0; //has value of true if slope is positive
-
     //get midpoint by traveling half of the slope from A
     var midPoint = {"lat":A.lat + (rise/2), "long":A.long + (run/2)};
-
     var invRise = Math.abs(run);  //the algorithm is handling whether to add or subtract it
     var invRun = Math.abs(rise);
     var i;
@@ -444,18 +464,15 @@ Graph.prototype.populateMidline = function(A, B) {
     
     var mpR = {"lat":midPoint.lat, "long":midPoint.long};  //point within right half of solution space
     var mpL = {"lat":midPoint.lat, "long":midPoint.long};  //point within left half of solution space
-
     //initialize points with the midpoint itself
     points.push(midPoint);
-    var X = 7; //the number of points to gather on each side of the midpoint. results in a midline of 2X + 1 vertices
-
+    var X = 5; //the number of points to gather on each side of the midpoint. results in a midline of 2X + 1 vertices
     if (origPos) {
         i = 0;
         while (i < X) {
             mpR.long = mpR.long + ((invRun / 2) / X);
             mpR.lat = mpR.lat - ((invRise / 2) / X);
             var p = {"lat":mpR.lat, "long":mpR.long};
-
             points.push(p);
             i++;
         }
@@ -484,29 +501,38 @@ Graph.prototype.populateMidline = function(A, B) {
             mpL.long = mpL.long - ((invRun / 2) / X);
             mpL.lat = mpL.lat - ((invRise/ 2) / X);
             var p = {"lat":mpL.lat, "long":mpL.long};
-
             points.unshift(p);
             i++;
         }
     }
+    
+    return points;
+    
+    
  
+}
+    
+    
+Graph.prototype.fitNodesToMidline = function(points) { //fits every point in points to a vertexObj
     //naive best-fitter algorithm:
     //bc every vertex in vertices calculates a diff with every single point, resulting in ((2X + 1) * vertices.length * numOfInstructionsPerDiff) instructions
     smallestDiffs = [];  //consists of 11 diffObj's (if X == 5) at positions 0 thru 10, corresponding to points 0 thru 10 (points 0 thru 4 are Left half, 5 is midPoint, and 6-10 are righthalf)
     //these objects are of the form {vid:X,diff:Y} to denote which vertex so far has the smallest difference, and what that difference is.
     //jth entry corresponds to jth point within points
     //initialize smallestDiff
-    for (var i = 0; i < 2 * X + 1; i++) {
+    //for (var i = 0; i < 2 * X + 1; i++) {
+    for (var i = 0; i < points.length; i++) {
         //??which vid to initialize it to??
         var value = {"vid":0, "diff": -1};
         smallestDiffs[i] = value;
     }
-
+    
     var V;
     var diff;  //sum of differences in latitude and longitude between V and a point in points
     var diffObj;
     for (var i = 0; i < this.vertices.length; i++) {
         for (var j = 0; j < points.length; j++) {
+        //for (var j = 0; j < 2 * X + 1; j++) {
             V = this.vertices[i];
             if (V) {
                 // should be sum of absolute values of differences
@@ -527,19 +553,26 @@ Graph.prototype.populateMidline = function(A, B) {
             }
         }
         
-
+        
     }
-
+    
     //once you fit a vertex to a point, you must remove that vertex from future consideration
     //at this point, smallestDiffs has diffObj with vid of the vertex best fit to that point
     bestFitNodes = [];  //ith entry contains the vertex best fit to point i of points
-    for (var i = 0; i < 2 * X + 1; i++) {
+    //for (var i = 0; i < 2 * X + 1; i++) {
+    for (var i = 0; i < points.length; i++) {
         V = this.vertices[smallestDiffs[i].vid];
         if (!(~indexOfVertex(V.vid, bestFitNodes)))     //in case same vertex best-fits to same point
-          bestFitNodes.push(V);
+            bestFitNodes.push(V);
     }
-   
+    
     return bestFitNodes;
+    
+    
+    
+    
+    
+    
 }
 
 
