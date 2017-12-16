@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, ElementRef, ViewChild } from '@angular/core';
+import { Component, Input, OnInit, ElementRef, ViewChild, NgModule } from '@angular/core';
 import { Options } from '../models/options';
 import { Location } from '../models/location';
 import { Node } from '../models/node';
@@ -9,6 +9,9 @@ import { LatLon } from '../models/latlon';
 import { LocationService } from '../services/location.service';
 import { ModalComponent } from '../modal/modal.component';
 import { HaversineService, GeoCoord } from "ng2-haversine";
+import {Http} from '@angular/http';
+import { Subscription } from 'rxjs/Subscription';
+
 
 @Component({
   selector: 'app-options',
@@ -17,7 +20,7 @@ import { HaversineService, GeoCoord } from "ng2-haversine";
 })
 export class OptionsComponent implements OnInit {
 
-  constructor(private locationService: LocationService, private _haversineService: HaversineService) { }
+  constructor(private locationService: LocationService, private _haversineService: HaversineService, private http: Http) { }
 
   nodeList: Node[];
   vertices: Vertex[] = [];
@@ -55,6 +58,7 @@ export class OptionsComponent implements OnInit {
   errorText: string;
   @ViewChild('modal') modal: ModalComponent;
 
+  busy: Subscription;
 
   ngOnInit() {
     this.maximizeElevation = false;
@@ -62,7 +66,8 @@ export class OptionsComponent implements OnInit {
     this.limit = 0;
     this.buttonText = "Route";
     this.mapRoute = false;
-  }
+   // this.busy = this.http.get('https://httpbin.org/delay/1').toPromise();    
+  } 
 
   elevationClick(val){
     if(this.maximizeElevation && this.minimizeElevation){
@@ -75,6 +80,7 @@ export class OptionsComponent implements OnInit {
   }
 
   submit() {
+    this.mapRoute=false;
     this.startLatitudeError = false;
     this.startLongitudeError = false;
     this.endLatitudeError = false;
@@ -177,7 +183,7 @@ export class OptionsComponent implements OnInit {
   }
 
   loadData(minLat, minLong, maxLat, maxLong) {
-    this.locationService.getNodes(minLat, minLong, maxLat, maxLong)
+    this.busy = this.locationService.getNodes(minLat, minLong, maxLat, maxLong)
       .subscribe(data => {
         this.nodeList = data.elements;
         console.log(this.nodeList);
