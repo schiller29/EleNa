@@ -21,18 +21,56 @@ export class LocationsComponent implements OnInit {
   endLatitude: number;
   endLongitude: number;
 
+  //Global map variables
+  startMap: any;
+  endMap: any;
+  startVectorSource: any;
+  endVectorSource: any;
+  iconStyle: any;
+
+  setPosition(position) {
+    if(!position){
+      return;
+    }
+    this.startMap.setView(new ol.View({
+      center: ol.proj.fromLonLat([position.coords.longitude, position.coords.latitude]),
+      zoom: 11
+    }));
+    this.startMap.setView(new ol.View({
+      center: ol.proj.fromLonLat([position.coords.longitude, position.coords.latitude]),
+      zoom: 11
+    }));
+    this.endMap.setView(new ol.View({
+      center: ol.proj.fromLonLat([position.coords.longitude, position.coords.latitude]),
+      zoom: 11
+    }));
+    this.endMap.setView(new ol.View({
+      center: ol.proj.fromLonLat([position.coords.longitude, position.coords.latitude]),
+      zoom: 11
+    }));
+    
+    //Set start location to users location
+    this.startLongitude = position.coords.longitude;
+    this.startLatitude = position.coords.latitude;
+    var feature = new ol.Feature({
+      geometry: new ol.geom.Point(ol.proj.fromLonLat([position.coords.longitude, position.coords.latitude]))
+    });
+    feature.setStyle(this.iconStyle);
+    this.startVectorSource.clear();
+    this.startVectorSource.addFeature(feature);
+  }
   ngOnInit() {
-    var startVectorSource = new ol.source.Vector();
+    this.startVectorSource = new ol.source.Vector();
     var startVectorLayer = new ol.layer.Vector({
-      source: startVectorSource
+      source: this.startVectorSource
     });
 
-    var endVectorSource = new ol.source.Vector();
+    this.endVectorSource = new ol.source.Vector();
     var endVectorLayer = new ol.layer.Vector({
-      source: endVectorSource
+      source: this.endVectorSource
     });
 
-    var startMap = new ol.Map({
+    this.startMap = new ol.Map({
       target: 'startMap',
       layers: [
         new ol.layer.Tile({
@@ -48,7 +86,7 @@ export class LocationsComponent implements OnInit {
       })
     });
 
-    var endMap = new ol.Map({
+    this.endMap = new ol.Map({
       target: 'endMap',
       layers: [
         new ol.layer.Tile({
@@ -64,7 +102,7 @@ export class LocationsComponent implements OnInit {
       })
     });
 
-    var iconStyle = new ol.style.Style({
+    this.iconStyle = new ol.style.Style({
       image: new ol.style.Icon({
           anchor: [0.5, 46],
           anchorXUnits: 'fraction',
@@ -81,28 +119,32 @@ export class LocationsComponent implements OnInit {
       })
     });
 
-    startMap.on('click', function(e) {
+    this.startMap.on('click', function(e) {
       var lonlat = ol.proj.toLonLat(e.coordinate, new ol.proj.Projection({code: 'EPSG:3857'}));
       this.startLongitude = lonlat[0];
       this.startLatitude = lonlat[1];
       var feature = new ol.Feature({
         geometry: new ol.geom.Point(e.coordinate)
       });
-      feature.setStyle(iconStyle);
-      startVectorSource.clear();
-      startVectorSource.addFeature(feature);
+      feature.setStyle(this.iconStyle);
+      this.startVectorSource.clear();
+      this.startVectorSource.addFeature(feature);
     }, this);
 
-    endMap.on('click', function(e) {
+    this.endMap.on('click', function(e) {
       var lonlat = ol.proj.toLonLat(e.coordinate, new ol.proj.Projection({code: 'EPSG:3857'}));
       this.endLongitude = lonlat[0];
       this.endLatitude = lonlat[1];
       var feature = new ol.Feature({
         geometry: new ol.geom.Point(e.coordinate)
       });
-      feature.setStyle(iconStyle);
-      endVectorSource.clear();
-      endVectorSource.addFeature(feature);
+      feature.setStyle(this.iconStyle);
+      this.endVectorSource.clear();
+      this.endVectorSource.addFeature(feature);
     }, this);
+    
+    if(navigator.geolocation){
+      navigator.geolocation.getCurrentPosition(this.setPosition.bind(this));
+    };
   }
 }

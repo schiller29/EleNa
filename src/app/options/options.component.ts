@@ -9,7 +9,7 @@ import { LatLon } from '../models/latlon';
 import { LocationService } from '../services/location.service';
 import { ModalComponent } from '../modal/modal.component';
 import { HaversineService, GeoCoord } from "ng2-haversine";
-import {Http} from '@angular/http';
+import { Http } from '@angular/http';
 import { Subscription } from 'rxjs/Subscription';
 
 
