@@ -1,0 +1,137 @@
+(4th parameter is true when we maximize elevation gain, and false when we minimize elevation gain).
+The following inputs to the driver function, evolver(), when run 5 times each, generated the following data for the local optimum, shortest path, and random path, respectively. The local optimum had at least as much elevation gain as the shortest path in 100% of runs. In only 1 out of 60 total runs did the random path ever return a better elevation gain than the genetic algorithm.
+The random path was formed by generating a midline a random fraction of the way from the start to end vertex, and fitting a node to a random point on that midline. The random path then was assigned as the concatenation of these two paths.
+Note that the elevation gain acheivable in the local optimum was shown to be correlated with higher xPercent values.
+
+Elevation gains read from left to right: 
+local optimum, shortest path, random path
+
+
+//maximize elevation gain
+evolver(graph.vertices, graph.edges, A, B, true, 125);
+13 10 12
+13 10 12
+13 10 10 
+13 10 12
+15 10 12
+
+evolver(graph.vertices, graph.edges, A, B, true, 150);
+16 10 12
+15 10 12
+18 10 12
+17 10 12
+18 10 10 
+
+evolver(graph.vertices, graph.edges, A, B, true, 200);
+17 10 12
+18 10 12
+17 10 28	<— random path had more elevation gain than genetic algorithm
+20 10 9
+18 10 12
+
+
+
+
+
+
+//minimize elevation gain
+evolver(graph.vertices, graph.edges, y, F, false, 125);
+11 11 19
+11 11 19
+7 11 11
+7 11 20
+7 11 11
+
+evolver(graph.vertices, graph.edges, y, F, false, 150);
+7 11 20
+7 11 19
+11 11 24
+11 11 19
+11 11 20
+
+evolver(graph.vertices, graph.edges, y, F, false, 200);
+9 11 19
+7 11 11
+11 11 11
+9 11 11
+11 11 19
+
+
+
+
+
+//maximize elevation gain
+evolver(graph.vertices, graph.edges, G, f, true, 125);
+23 6 6 
+23 6 6 
+28 6 11
+28 6 6 
+23 6 8
+
+evolver(graph.vertices, graph.edges, G, f, true, 150);
+28 6 6 
+23 6 6 
+28 6 6 
+28 6 6 
+28 6 3
+
+evolver(graph.vertices, graph.edges, G, f, true, 150);
+32 6 6 
+32 6 6 
+32 6 3
+32 6 6 
+32 6 3
+
+
+
+
+
+//maximize elevation gain
+evolver(graph.vertices, graph.edges, R, D, true, 125);
+21 11 11
+21 11 12
+11 11 11
+13 11 12
+21 11 11
+
+evolver(graph.vertices, graph.edges, R, D, true, 150);
+24 11 11
+27 11 11
+26 11 11
+14 11 11
+21 11 11
+
+evolver(graph.vertices, graph.edges, R, D, true, 200);
+30 11 11
+30 11 11
+19 11 13
+29 11 11
+24 11 11
+
+
+
+
+
+maximize elevation gain
+evolver(graph.vertices, graph.edges, J, e, true, 125);
+
+29 3 23
+29 3 3 
+24 3 3
+29 3 8
+29 3 8
+
+evolver(graph.vertices, graph.edges, J, e, true, 150);
+29 3 3
+29 3 9
+29 3 8
+29 3 23
+28 3 8
+
+evolver(graph.vertices, graph.edges, J, e, true, 200);
+36 3 8
+36 3 8
+31 3 9
+29 3 8
+28 3 11
+
