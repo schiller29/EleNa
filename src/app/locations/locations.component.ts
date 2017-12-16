@@ -41,7 +41,8 @@ export class LocationsComponent implements OnInit {
   setPosition(position) {
     if(!position){
       return;
-    }
+    } 
+    this.useCurrentLocation = true;
     this.startMap.setView(new ol.View({
       center: ol.proj.fromLonLat([position.coords.longitude, position.coords.latitude]),
       zoom: 11
