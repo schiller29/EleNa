@@ -19,3 +19,7 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 1. Before running any tests, run `ng serve` to start the application. Selenium and Python are required to run some of the tests. Selenium can be installed at http://www.seleniumhq.org/projects/webdriver/ and Python can be installed at https://www.python.org/downloads/. It may be necessary to run pip install selenium to install the components for python.
 2. To test the routing algorithm, open the file 'src/app/options/test_algorithm.html' in a browser window. This will run the tests in 'src/app/options/test_algorithm.js' and show the number of failures. 
 3. To test the front-end of the application, run 'python qa/gui/test_ui_validation.py'
+
+## Note about the algorithm explanation:
+In mockgraph.JPG:
+the number written in pen over each node refers to its elevation, and edge numbers refer to distance. As an example, I drew the midpoint (mp) and the midline through it for start = A and end = B. The best fit nodes when fitting up to 7 come out to u, T, r, E, and F, which are circled. the x axis is longitude and y axis is latitude.

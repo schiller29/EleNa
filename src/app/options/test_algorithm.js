@@ -1,5 +1,5 @@
 var num_failures = 0;
-//kept the for loop not visually indented to be easily removed.
+
 for(i = 0; i < 10; i++){
 	var graph = new Graph();
 
@@ -184,16 +184,16 @@ for(i = 0; i < 10; i++){
 	
 	var assert = function(condition, message) { 
     	if (!condition){
-        	throw Error("Assert failed" + (typeof message !== "undefined" ? ": " + message : ""));
+  			document.writeln('The test failed!')
         	num_failures++;
     	}
 	};
-
 	evolver(graph.vertices, graph.edges, R, D, true, 200);
 	assert(CURRENT_BEST >= SHORTEST_PATH_EL, "The found path was better performance than shortes path");
-	assert(CURRENT_BEST_PL <= longestAllowedPath);
-	document.writeln("compared to gain of shortest path, which is " + graphx.elevGainOf(shortestPathDist.path));
-	//document.writeln("and has a path of " + graph.pathToString(graph.dijkstra(start,end).path));
+	assert(CURRENT_BEST_PL <= LONGEST_PATH);
+	evolver(graph.vertices, graph.edges, R, D, false, 200);
+	assert(CURRENT_BEST <= SHORTEST_PATH_EL, "The found path was better performance than shortes path");
+	assert(CURRENT_BEST_PL <= LONGEST_PATH);
 }
 
 document.writeln('The number of failures were: ' + num_failures);
