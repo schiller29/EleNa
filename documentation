@@ -1,0 +1,20 @@
+Purpose:
+EleNa is an elevation based navigation project. Given a start and end location, EleNa will provide a route that either maximizes or minimizes elevation gain. If no elevation preference is given, a shortest distance route will instead be given.
+
+Features:
+Provide a shortest distance route between two locations
+Provide an option to maximize elevation gain with a limit on total distance for the route
+Provide an option to minimize elevation gain with a limit on total distance for the route
+
+Use Cases:
+Bob is an avid biker with an upcoming marathon. In order to prepare, Bob wants to practice biking up hills. To get such a biking route, Bob opens up EleNa. In EleNa, Bob picks a start and end location by clicking the desired locations on the map. Because he wants to bike up hills, he selects maximize elevation gain. In addition, Bob wants to get a good workout in at the same time. Since he wants to get a good workout, he sets limit on total distance to 0. Bob then hits the route button in order to get the route for his biking workout.
+
+Bob has just finished a grueling biking workout and is tired. He just wants to coast down hills in order to cool down. To get such a biking route, Bob opens up EleNa. In EleNa, Bob picks a start and end location by clicking the desired locations on the map. Because he wants to bike down hills, he selects minimize elevation gain. Since Bob is tired, he wants a relatively short route to cooldown with and sets the limit on total distance to 50%. Bob then hits the route button in order to get the route for his cooldown exercise.
+
+Jane wants to walk to a party at 123, 5th street in her town. She just wants to walk to the party from her current location in the shortest distance possible, but she does not know how to get there. To find out how to get there, Jane opens up EleNa. Jane clicks and enables the "Use Current Location" option. Jane then selects the party's address on the map as the end location. Since Jane wants to get there in the shortest distance possible and does not care about walking up or down hills, she does not select minimize or maximize elevation gain. She also leaves the limit on total distance blank. Jane then hits route in order to get the route for her trip.
+
+Notes:
+
+Due to time constraints, our application does not fully function as intended. Upon selecting two locations, and pressing the route button, we are currently displaying a route that is constructed from mock data. Our algorithm is not currently fully compatible with the data that we parsed from Overpass API. Our progress on our algorithm can be found in src/app/options/elenaupdate.js. The data that we retrieved and parsed is being logged to the Console and can be viewed there after clicking the "route" button with the start and end locations selected. 
+
+

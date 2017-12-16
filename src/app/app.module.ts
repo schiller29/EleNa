@@ -12,7 +12,8 @@ import { RouteComponent } from './route/route.component';
 import { LocationService } from './services/location.service';
 import { ModalComponent } from './modal/modal.component';
 import { HaversineService } from "ng2-haversine";
-
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { BusyModule } from 'angular2-busy';
 
 @NgModule({
   declarations: [
@@ -25,7 +26,9 @@ import { HaversineService } from "ng2-haversine";
   imports: [
     BrowserModule,
     FormsModule,
-    HttpModule
+    HttpModule,
+    BrowserAnimationsModule,
+    BusyModule
   ],
   providers: [LocationService, HaversineService],
   bootstrap: [AppComponent]

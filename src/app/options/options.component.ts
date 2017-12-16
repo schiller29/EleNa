@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, ElementRef, ViewChild } from '@angular/core';
+import { Component, Input, OnInit, ElementRef, ViewChild, NgModule } from '@angular/core';
 import { Options } from '../models/options';
 import { Location } from '../models/location';
 import { Node } from '../models/node';
@@ -8,9 +8,12 @@ import { Edge } from '../models/edge';
 import { LatLon } from '../models/latlon';
 import { LocationService } from '../services/location.service';
 import { ModalComponent } from '../modal/modal.component';
-import { HaversineService, GeoCoord } from 'ng2-haversine';
 
 declare var evolver: any;
+import { HaversineService, GeoCoord } from "ng2-haversine";
+import { Http } from '@angular/http';
+import { Subscription } from 'rxjs/Subscription';
+
 
 @Component({
   selector: 'app-options',
@@ -19,7 +22,7 @@ declare var evolver: any;
 })
 export class OptionsComponent implements OnInit {
 
-  constructor(private locationService: LocationService, private _haversineService: HaversineService) { }
+  constructor(private locationService: LocationService, private _haversineService: HaversineService, private http: Http) { }
 
   nodeList: Node[];
   vertices: Vertex[] = [];
@@ -58,8 +61,10 @@ export class OptionsComponent implements OnInit {
   mapRoute: boolean;
 
   errorText: string;
-  @ViewChild('modal') modal: ModalComponent;
+  @ViewChild('modalInputError') modalInputError: ModalComponent; //Modal dialog for bad user input
+  @ViewChild('modalAppFailure') modalAppFailure: ModalComponent; //Modal dialog for routing failure
 
+  busy: Subscription;
 
   ngOnInit() {
     this.maximizeElevation = false;
@@ -67,7 +72,8 @@ export class OptionsComponent implements OnInit {
     this.limit = 0;
     this.buttonText = "Route";
     this.mapRoute = false;
-  }
+   // this.busy = this.http.get('https://httpbin.org/delay/1').toPromise();    
+  } 
 
   elevationClick(val){
     if(this.maximizeElevation && this.minimizeElevation){
@@ -80,6 +86,7 @@ export class OptionsComponent implements OnInit {
   }
 
   submit() {
+    this.mapRoute=false;
     this.startLatitudeError = false;
     this.startLongitudeError = false;
     this.endLatitudeError = false;
@@ -90,7 +97,7 @@ export class OptionsComponent implements OnInit {
       this.mapRoute = false;
       this.buttonText = 'Route';
       this.errorText = this.generateErrorText();
-      this.modal.show();  
+      this.modalInputError.show();  
     }
   }
 
@@ -189,6 +196,7 @@ export class OptionsComponent implements OnInit {
         this.vertices.push(startVertex);
         this.vertices.push(endVertex);
       })
+    //set minimum and maximum latitudes and longitudes to retrieve Overpass API data using a bounded box
     if(sLatitude > eLatitude){
       var minLat = eLatitude;
       var maxLat = sLatitude;
@@ -212,20 +220,29 @@ export class OptionsComponent implements OnInit {
   // this will parse through the data received from the API to populate the 
   // vertices and edges lists, which are required by the algorithm
   loadData(minLat, minLong, maxLat, maxLong) {
-    this.locationService.getNodes(minLat, minLong, maxLat, maxLong)
-      .subscribe(data => {
-        this.nodeList = data.elements;
-        console.log(this.nodeList);
-        console.log('intersecting nodes loaded');
-        console.log('loading way data');
-        this.locationService.getWays(minLat, minLong, maxLat, maxLong)
-          .subscribe(data => {
-            this.wayList = data.elements;
-            console.log(this.wayList);
-            console.log('way data loaded');
-            this.populateLists();
-          })
-    })
+    this.busy = this.locationService.getNodes(minLat, minLong, maxLat, maxLong)
+      .subscribe(
+        data => {
+          this.nodeList = data.elements;
+          console.log(this.nodeList);
+          console.log('intersecting nodes loaded');
+          console.log('loading way data');
+          this.locationService.getWays(minLat, minLong, maxLat, maxLong)
+            .subscribe(
+              data => {
+                this.wayList = data.elements;
+                console.log(this.wayList);
+                console.log('way data loaded');
+                this.populateLists();
+              },
+              error => {
+                console.log("Caught Error!!!")
+            });
+        }, 
+        error => {
+          console.log("Caught error!!")
+        }
+      );
   }
 
   // populates the edges lists with data from API
@@ -296,9 +313,16 @@ export class OptionsComponent implements OnInit {
       .subscribe(data => {
         this.location = data.results;
         console.log(this.location);
+        console.log('printing vertices');
         this.populateVertices();
+        console.log('printing edges');
         this.populateEdges();
+        
+        //entry point into the algorithm
         evolver(this.vertices,this.edges,true,this.limit);
+      },
+      error => {
+        this.modalAppFailure.show();  
       })
   }
 

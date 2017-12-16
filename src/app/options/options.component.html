@@ -3,12 +3,12 @@
     <h4>Additional Options</h4>
     <div>
         <label>Maximize Elevation Gain:
-          <input [(ngModel)]="maximizeElevation" id="maximize" placeholder="maximize" type="checkbox" (change)="elevationClick('maximize')" >
+          <input class="inputCheckbox" [(ngModel)]="maximizeElevation" id="maximize" placeholder="maximize" type="checkbox" (change)="elevationClick('maximize')" >
         </label>
     </div>
     <div>
         <label>Minimize Elevation Gain:
-          <input [(ngModel)]="minimizeElevation" id="minimize" placeholder="minimize" type="checkbox" (change)="elevationClick('minimize')" >
+          <input class="inputCheckbox" [(ngModel)]="minimizeElevation" id="minimize" placeholder="minimize" type="checkbox" (change)="elevationClick('minimize')" >
         </label>
     </div>  
     <div>
@@ -17,14 +17,10 @@
         </label>
     </div>
     <br>
-  
-  <div *ngIf="endLatitudeError" style="color:red">
-    <div ng-message="validationError">{{errorMessage}}</div>
-</div>
-
   <button (click)="submit()" id="route">{{buttonText}}</button>  
   </div>
   <div class="col-8">
+    <div [ngBusy]="busy"></div>
     <app-route *ngIf="mapRoute">
     </app-route>
     <br>
@@ -32,11 +28,19 @@
 </div>
 
 
-<app-modal #modal id="modal">
+<app-modal #modalInputError id="modalInputError">
   <div class="app-modal-header">
     <h5>Please enter a valid value for</h5>
   </div>
   <div class="app-modal-body">
     <p id="errorText">{{errorText}}</p>
+  </div>
+</app-modal>
+<app-modal #modalAppFailure id="modalAppFailure">
+  <div class="app-modal-header">
+    <h5>Error!</h5>
+  </div>
+  <div class="app-modal-body">
+    <p id="errorText">Failure calculating route. Please restart the application and select locations closer to each other.</p>
   </div>
 </app-modal>

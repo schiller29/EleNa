@@ -15,6 +15,7 @@ export class LocationService {
 
   OVERPASS_WAY_URL = 'https://www.overpass-api.de/api/interpreter?data=[out:json];way(';
 
+  // Overpass QL to retrieve intersections
   OVERPASS_INTERSECTION_QUERY = ');)->.n1;foreach.n1((.n1;%20-%20._;)->.n2;node(w._)->.n3;node(w.n2)->.n2;node.n3.n2;out;);';
 
   // gets elevation data from API
