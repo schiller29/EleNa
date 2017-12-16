@@ -14,7 +14,5 @@ Bob has just finished a grueling biking workout and is tired. He just wants to c
 Jane wants to walk to a party at 123, 5th street in her town. She just wants to walk to the party from her current location in the shortest distance possible, but she does not know how to get there. To find out how to get there, Jane opens up EleNa. Jane clicks and enables the "Use Current Location" option. Jane then selects the party's address on the map as the end location. Since Jane wants to get there in the shortest distance possible and does not care about walking up or down hills, she does not select minimize or maximize elevation gain. She also leaves the limit on total distance blank. Jane then hits route in order to get the route for her trip.
 
 Notes:
-
 Due to time constraints, our application does not fully function as intended. Upon selecting two locations, and pressing the route button, we are currently displaying a route that is constructed from mock data. Our algorithm is not currently fully compatible with the data that we parsed from Overpass API. Our progress on our algorithm can be found in src/app/options/elenaupdate.js. The data that we retrieved and parsed is being logged to the Console and can be viewed there after clicking the "route" button with the start and end locations selected. 
-
-
+Please choose two locations that are close to each other in a remote area, preferably away from a city or town for best performance. The application does not function as intended if too much data is retrieved.

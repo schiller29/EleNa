@@ -36,6 +36,8 @@ export class OptionsComponent implements OnInit {
 
   intersectingNodes: number[] = [];
 
+  //Location Variables
+  //Start and end locations passes as parameter from Locations component
   startLocation: Location;
   @Input() startLongitude: number;
   @Input() startLatitude: number;
@@ -44,56 +46,69 @@ export class OptionsComponent implements OnInit {
   @Input() endLongitude: number;
   @Input() endLatitude: number;
 
+  //Options Variables
   options: Options;
   maximizeElevation: boolean;
   minimizeElevation: boolean;
   limit: number;
 
-  startLatitudeError: boolean = false;
-  startLongitudeError: boolean = false;
-  endLatitudeError: boolean = false;
-  endLongitudeError: boolean = false;
-  limitError: boolean = false;
+  //Error Variables
+  //Initialize errors as false
+  startLatitudeError: boolean;
+  startLongitudeError: boolean;
+  endLatitudeError: boolean;
+  endLongitudeError: boolean;
+  limitError: boolean;
 
   errorMessage : string = "";
 
+  //ButtonText = "Route" or "Re-route"
   buttonText: string;
+  //Boolean that determines whether or not we are ready to render the final route
   mapRoute: boolean;
 
+  //Error Text for input errors
   errorText: string;
   @ViewChild('modalInputError') modalInputError: ModalComponent; //Modal dialog for bad user input
-  @ViewChild('modalAppFailure') modalAppFailure: ModalComponent; //Modal dialog for routing failure
+  @ViewChild('modalAppFailure') modalAppFailure: ModalComponent; //Modal dialog for failure on calculating route
 
+  //Variable that maps to a "Please wait" loading message
   busy: Subscription;
 
   ngOnInit() {
+    //Initialize variables
     this.maximizeElevation = false;
     this.minimizeElevation = false;
     this.limit = 0;
     this.buttonText = "Route";
     this.mapRoute = false;
-   // this.busy = this.http.get('https://httpbin.org/delay/1').toPromise();    
+    this.startLatitudeError = false;
+    this.startLongitudeError = false;
+    this.endLatitudeError = false;
+    this.endLongitudeError = false;
   } 
 
+  //User clicked on elevation checkbox
   elevationClick(val){
     if(this.maximizeElevation && this.minimizeElevation){
-      if(val=="maximize"){
+      if(val=="maximize"){ //If maximize is selected, then minimize cannot be selected
         this.minimizeElevation = false;
-      } else {
+      } else { //If minimize is selected, then maximize cannot be selected
         this.maximizeElevation = false;
       }
     }
   }
 
+  //User hit route button
   submit() {
-    this.mapRoute=false;
-    this.startLatitudeError = false;
+    this.mapRoute=false; //Remove old route
+    this.startLatitudeError = false; //Reset errors
     this.startLongitudeError = false;
     this.endLatitudeError = false;
     this.endLongitudeError = false;
-    if (!this.checkInputError()){
+    if (!this.checkInputError()){ //Check if inputs are valid values
       this.loadLocations(this.startLatitude, this.startLongitude, this.endLatitude, this.endLongitude);
-    } else {
+    } else { //Otherwise reset and show an error message
       this.mapRoute = false;
       this.buttonText = 'Route';
       this.errorText = this.generateErrorText();
@@ -101,6 +116,7 @@ export class OptionsComponent implements OnInit {
     }
   }
 
+  //Error text
   generateErrorText(){
     var error = "";
     if(this.startLatitudeError){
@@ -127,47 +143,42 @@ export class OptionsComponent implements OnInit {
     this.startLongitudeError = false;
     this.endLatitudeError = false;
     this.endLongitudeError = false;
-
     var inputError = false;
-    //just going to assume for simplicity's sake that 0 is an invalid lat + long
-    if(isNaN(this.startLatitude) || this.startLatitude == 0 || Math.abs(this.startLatitude) > 90){
+    //Check longitude and latitude inputs and see if they conform to format
+    if(isNaN(this.startLatitude) || Math.abs(this.startLatitude) > 90){
       this.startLatitudeError = true;
       inputError = true;
     } else {
       this.startLatitudeError = false;
     }
-    if(isNaN(this.startLongitude) || this.startLongitude == 0 || Math.abs(this.startLongitude) > 180){
+    if(isNaN(this.startLongitude) || Math.abs(this.startLongitude) > 180){
       this.startLongitudeError = true;
       inputError = true;
     } else {
       this.startLongitudeError = false;
     }
-    if(isNaN(this.endLatitude) || this.endLatitude == 0 || Math.abs(this.endLatitude) > 90){
+    if(isNaN(this.endLatitude) || Math.abs(this.endLatitude) > 90){
       this.endLatitudeError = true;
       inputError = true;
     } else {
       this.endLatitudeError = false;
     }
-    if(isNaN(this.endLongitude) || this.endLongitude == 0 || Math.abs(this.endLongitude) > 180){
+    if(isNaN(this.endLongitude) || Math.abs(this.endLongitude) > 180){
       this.endLongitudeError = true;
       inputError = true;
     } else {
       this.endLongitudeError = false;
     }
-    if(isNaN(this.limit) || this.limit > 1000 || this.limit < 0){
+    if(isNaN(this.limit) || this.limit < 0){
       this.limitError = true;
       inputError = true;
     } else {
       this.limitError = false;
     }
-    console.log(inputError)
     return inputError;
   }
   
   startRoute(sLatitude, sLongitude, eLatitude, eLongitude){
-    console.log("Maximize: " + this.maximizeElevation);
-    console.log("Minimize: " + this.minimizeElevation);
-    console.log("Limit: " + this.limit);
     let startLatLon: LatLon = {
       lat: sLatitude,
       lon: sLongitude
@@ -236,11 +247,9 @@ export class OptionsComponent implements OnInit {
                 this.populateLists();
               },
               error => {
-                console.log("Caught Error!!!")
             });
         }, 
         error => {
-          console.log("Caught error!!")
         }
       );
   }
@@ -322,7 +331,7 @@ export class OptionsComponent implements OnInit {
         evolver(this.vertices,this.edges,true,this.limit);
       },
       error => {
-        this.modalAppFailure.show();  
+        this.modalAppFailure.show();  //Show a modal dialog if calculating the route fails
       })
   }
 

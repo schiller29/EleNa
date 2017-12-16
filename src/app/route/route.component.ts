@@ -15,10 +15,11 @@ export class RouteComponent implements OnInit {
   constructor(private http:Http) {
   }
 
-  
   @ViewChild('routeMapDiv') routeMapDiv: ElementRef;
 
   ngOnInit() {
+    //Get mock data from data.json file. If algorithm is properly implemented, data.json will hold the latitude and longitudes
+    //for the calculated route
     this.http.get('assets/data.json')
       .subscribe( res => {
           this.routeLocations = res.json();
@@ -26,14 +27,16 @@ export class RouteComponent implements OnInit {
         }
       );
   }
+  //Take the mock data and map it
   mapRoute(lonlat){
-    console.log(lonlat);
+    //Create a line consisting of all the points in the mock data
     var routeGeom = new ol.geom.LineString(lonlat);
     routeGeom = routeGeom.transform('EPSG:4326', 'EPSG:3857');
     var routeFeature = new ol.Feature({geometry:routeGeom});
     var routeStyle = new ol.style.Style({
        stroke : new ol.style.Stroke({color : '#ff0000', width: 5, lineCap: 'square'}),
     });
+    //Set the zoom boundary of the map based on the calculated route
     var extentToZoom = routeGeom.getExtent();
     routeFeature.setStyle(routeStyle);
     var routeVectorSource = new ol.source.Vector({
@@ -42,7 +45,7 @@ export class RouteComponent implements OnInit {
     var routeVectorLayer = new ol.layer.Vector({
       source: routeVectorSource
     });
-
+    //Initialize the map for the calculated route
     var routeMap = new ol.Map({
       target: 'routeMap',
       layers: [
