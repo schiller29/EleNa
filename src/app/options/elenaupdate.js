@@ -1,38 +1,18 @@
-/*global document require*/
+//click on elena.html to run in browser
+//Scroll to bottom of page to see the path constructed with optimized gain, and its comparison with the gain of both the shortest path as well as with the gain of a randomly generated path.
 
 var CURRENT_BEST = 0;
-var CURRET_BEST_PL = 0;
+var CURRENT_BEST_PL = 0;
+var SHORTEST_PATH_EL = 0;
+var longestAllowedPath = 0;
 
 
-function evolver(vertices, edges, maxOrMin, xPercent) {
-    var graphx = new Graph();
-    graphx.edges = edges;
-    graphx.vertices = vertices;
-    
-    var start = graphx.vertices[0];
-    var end = graphx.vertices[1];
-    var points = graphx.populateMidline(start,end);
-    var bfn = graphx.fitNodesToMidline(points);
-    
-    var shortestPathDist = graphx.astar(start,end);
-    var shortestDist = shortestPathDist.d;
-    var longestAllowedPath = shortestDist * (xPercent / 100);
-    var pop = graphx.generateInitialPopulation(start,end,bfn, longestAllowedPath);
-    
-    document.writeln("lap is " + longestAllowedPath);
-    
-        
-    var o = graphx.evolvePopulation(pop, longestAllowedPath, start, end, maxOrMin);
-    document.writeln("compared to gain of shortest path, which is " + graphx.elevGainOf(shortestPathDist.path));
-    document.writeln("and has a path of " + graphx.pathToString(graphx.astar(start,end).path));
-}
-
-function vertexObj(vid, lat, long, elev/*, label*/) {
+function vertexObj(vid, lat, long, elev, label) {
     this.vid = vid;
     this.lat = lat;
     this.long = long;
     this.elev = elev;
-    //this.label = label;
+    this.label = label;
 }
 
 
@@ -51,7 +31,6 @@ function indexOfVertex(Vvid, Vertexes) {
 function getRandomInteger(min, max) {
     return Math.floor(Math.random() * (max - min + 1) ) + min;
 }
-
 
 
 function Graph() {
@@ -85,12 +64,8 @@ Graph.prototype.pathLength = function(path) { //path is an array of vertexObj's
         }
         i++;
     }
-    //document.writeln("path length of " + this.pathToString(path) + " is:");
-    //document.writeln("->" + length);
     return length;
 }
-
-
 
 
 Graph.prototype.addVertexObj = function(vertexObj) {
@@ -99,17 +74,115 @@ Graph.prototype.addVertexObj = function(vertexObj) {
 };
 
 
-
-
-
 //add undirected edge containing v1 and v2 with a distance of dist
 //(add directed edge from v1 to v2, and directed edge from v2 to v1)
 Graph.prototype.addEdge = function(vertexObj1, vertexObj2, dist) {
-  //this.edges[vertexObj1.vid].push({vid:vertexObj2.vid, d:dist});
-    //var v1 = new vertexObj(1, 0, 0, 0);
     this.edges[vertexObj1.vid].push({vid:vertexObj2.vid, d:dist});
     this.edges[vertexObj2.vid].push({vid:vertexObj1.vid, d:dist});
 }
+
+
+/*
+Graph.prototype.removeEdge = function(V1, V2) {
+    var edgesOfV1,edgesOfV2;
+    //document.writeln("a");
+    //document.writeln("V1 is " + V1.label + ", V2 is " + V2.label);
+
+    if (this.edges[V1.vid])  { //if edgelist of vertexObj1 exists
+        //document.writeln("e");
+
+        edgesOfV1 = this.edges[V1.vid];
+        //document.writeln("f");
+
+        for (var i = 0; i < edgesOfV1.length; i++) {
+            //document.writeln("g");
+
+            if (edgesOfV1[i].vid == V2.vid) {
+                //document.writeln("h");
+
+                edgesOfV1.splice(i,1);
+                //document.writeln("i");
+
+                break;
+            }
+            //document.writeln("j");
+
+        }
+    }
+    //document.writeln("b");
+
+    if (this.edges[V2.vid]) {  //if edgelist of vertexObj2 exists
+        edgesOfV2 = this.edges[V2.vid];
+        for (var i = 0; i < edgesOfV2.length; i++) {
+            if (edgesOfV2[i].vid == V1.vid) {
+                edgesOfV2.splice(i,1);
+                break;
+            }
+        }
+    }
+    //document.writeln("c");
+
+}
+*/
+
+/*
+Graph.prototype.removeNodes = function(nodeList) { //remove the edges of every vertexObj within nodeList, and store them in the form of (vertexObj, vertexObj, <distance between them>) triples within returned list, so they can be put back later
+    //document.writeln("hey");
+    var tempRemovedEdges = [];
+    var Vs, Ve, edgesOfVs;
+    for (var k = 0; k < nodeList.length; k++) {
+        //document.writeln("yeah");
+
+        Vs = nodeList[k];
+        //document.writeln("Vs is " + Vs.label);
+
+        edgesOfVs = this.edges[Vs.vid];
+        //document.writeln("edges of " + Vs.label + ": " + JSON.stringify(edgesOfVs));
+        //document.writeln("length initial " + edgesOfVs.length);
+        
+        while (edgesOfVs.length > 0) {
+            //document.writeln("length before " + edgesOfVs.length);
+
+            //document.writeln("no");
+            //document.writeln("j is " + j);
+
+            Ve = this.vertices[edgesOfVs[0].vid];
+            //document.writeln("Ve is " + Ve.label);
+
+            //document.writeln("x");
+
+            tempRemovedEdges.push({v1:Vs, v2:Ve, weight:edgesOfVs.d});
+            //document.writeln("y");
+
+            this.removeEdge(Vs,Ve);
+            //document.writeln("z");
+            //document.writeln("length after " + edgesOfVs.length);
+
+
+        }
+    }
+
+    return tempRemovedEdges;
+    
+}
+*/
+
+
+/*
+Graph.prototype.restoreEdges = function(tempRemovedEdges) {//tempRemovedEdges is a list of (vertexObj, vertexObj, <distance between them>) triples
+    var V1, V2, weight;
+    for (var i = 0; i < tempRemovedEdges.length; i++) {
+        V1 = tempRemovedEdges[i].v1;
+        V2 = tempRemovedEdges[i].v2;
+        weight = tempRemovedEdges[i].weight;
+        this.addEdge(V1, V2, weight);
+        
+        
+        document.writeln("added edge with V1 of " + V1.label + ", V2 of " + V2.label + ", and weight of " + weight);
+
+    }
+}
+*/
 
 
 Graph.prototype.nodeInCommon = function(path1, path2) {
@@ -126,7 +199,7 @@ Graph.prototype.nodeInCommon = function(path1, path2) {
 }
 
 
-/*
+
 Graph.prototype.print = function() {
     var  V1, V2, edgesOfV, edge, edges;
     for (var i = 0; i < this.vertices.length; i++) {
@@ -149,18 +222,6 @@ Graph.prototype.print = function() {
 }
 
 
-Graph.prototype.printPath = function(path) {
-    var s = "";
-    for (var i = 0; i < path.length; i++) { //ith vertex of ith child path
-        s = s + " -> " + path[i].label;
-    }
-    s = s.slice(4);
-    document.writeln(s);
-}
-
-*/
-
-/*
 Graph.prototype.pathToString = function(path) {
     var s = "";
     for (var i = 0; i < path.length; i++) {
@@ -169,135 +230,6 @@ Graph.prototype.pathToString = function(path) {
     s = s.slice(4);
     return s;
 }
-*/
-/*
-//for bestFitNodes, etc.
-Graph.prototype.nodeListToString = function(nodeList) {
-    var s = "";
-    for (var i = 0; i < nodeList.length; i++) {
-        s = s + ", " + nodeList[i].label;
-    }
-    s = s.slice(2);
-    return s;
-}
-
-*/
-
-Graph.prototype.dijkstra = function(A, B) {
-    if(!this.vertices[A.vid]) {
-        return {"path":[], "d":0};
-    }
-    
-    //changing open and closed to have their indices correspond to the vid's of the vertexObj's in this.vertices
-    
-    //edge case, A == B
-    if (A.vid == B.vid) {
-        document.writeln("A == B. dist is 0");
-        return {"path":[A], "d":0};
-    }
-    
-    var open = [];  //"unvisited" (contains true at index i to signify that vertex with vid == i has not yet been visited)
-    var closed = [];  //"visited" (contains true at index i to signify that vertex with vid == i has not already been visited)
-    var unvisited = []  //list of actual vertexObj's
-    var shortestDistsFromA = [];  //ith entry contains shortest distance from vertexStart to the vertex with vid == i
-    //initialize the shortest distance to every vertex to Infinity
-    for (var i = 0; i < this.vertices.length; i++) {
-        if (this.vertices[i])  {//if the vertex exists
-            shortestDistsFromA[i] = Infinity;
-        }
-    }
-    //but assign 0 as the shortest distance to startVertex
-    shortestDistsFromA[A.vid] = 0;
-    
-    var parents = [];  //ith entry contains vid of parent of vertex whose vid == i
-    open.push(A);
-    var gx;  //"g(x)" = distance from startVertex to a given vertex
-    var vertexObj;
-    var openD = [];  //distances of elements in open. contains shortest distance of vertex with position i within open at position i within openD
-    
-    //open and openD are designed to always maintain the same indices. index i of vertex V in open has its shortest distance recorded at index i of openD
-    var visitCounter = 0;
-    //var j = 0;
-    ///
-    ///remove j < 100 when test on OSM data///
-    ///
-    //while (open.length && j < 100) {
-
-    while (open.length) {
-        //set vertexObj to the vertex in open with shortest known distance from A
-        openD = [];
-        for(var i = 0; i < open.length; i++) {
-            openD[i] = shortestDistsFromA[open[i].vid];  //populate shortest distances of open list
-        }
-        
-        
-        //assign vertexObj to the vertex in open with shortest distance From A
-        
-        var minDistOfOpenD = Math.min.apply(null, openD);  //smallest distance in openD
-        var Vid = shortestDistsFromA.indexOf(minDistOfOpenD);  //vertex that has this minDist has position Vid in shortestDistsFromA...
-        //but have to make sure the vertex with this min distance hasnt yet been visited, bc it could could be tied for the min distance with a vertex that has already been visited, and which also occurs earlier in the list, thus always being chosen even though it should never have been chosen again
-        
-        while (~indexOfVertex(Vid, closed)) {  //keep calculating a new Vid until arrive at one that has not yet been visited (while its in closed)
-            Vid = shortestDistsFromA.indexOf(minDistOfOpenD, Vid + 1);  //check Vid's starting at position after the current position
-        }
-
-        //...and therefore the same position within this.vertices
-        vertexObj = this.vertices[Vid];
-        visitCounter++;
-        closed.push(vertexObj);
-        open.splice(indexOfVertex(vertexObj.vid, open), 1); //remove from open
-        //remove it from openD as well
-        openD.splice(indexOfVertex(vertexObj.vid, open), 1);
-        
-        for(var i = 0; i < this.edges[vertexObj.vid].length; i++) {
-            //if neighbor is unvisited
-            var neighborVid = this.edges[vertexObj.vid][i].vid;
-            var distToNeighbor = this.edges[vertexObj.vid][i].d;
-
-            if (!~indexOfVertex(neighborVid,closed)) {  //if neighbor has not yet been visited
-                neighborV = this.vertices[neighborVid];
-                //make sure its not already in open before adding it
-                if (!~indexOfVertex(neighborVid,open)) {
-                  open.push(neighborV);
-                }
-                gx = shortestDistsFromA[vertexObj.vid] + distToNeighbor;
-                if (gx < shortestDistsFromA[neighborVid]) {
-                    //update shortest distance from A to that neighbor
-                    shortestDistsFromA[neighborVid] = gx;
-
-                    //and update the neighbor's parent
-                    parents[neighborVid] = vertexObj.vid;
-                }
-            } //if vertex not in closed
-        }
-        //j++;
-    }
-    
-    //obtain shortest path from A to B
-    vertexObj = B;
-    var dist = shortestDistsFromA[vertexObj.vid];
-    path = [vertexObj];
-
-    while (parents[vertexObj.vid] != A.vid) {
-        parent = this.vertices[parents[vertexObj.vid]];
-        path.unshift(parent); //add parent vertexObj to head of path
-        vertexObj = this.vertices[parents[vertexObj.vid]];
-    }
-
-    //dont forget to add A at the end
-    parent = this.vertices[parents[vertexObj.vid]];
-    path.unshift(parent);
-    var dist = shortestDistsFromA[B.vid];
-    //actually, need to return both the path itself as well as its length, so return an object
-    //document.writeln("shortest distance from " + A.label + " to " + B.label + ": " + dist);
-
-    return {"path":path, "d":dist};  //returns object containing list of vertexObj's and its length
- 
-}
-
-
- 
-
 
 
 Graph.prototype.astar = function(start, end) {
@@ -305,13 +237,12 @@ Graph.prototype.astar = function(start, end) {
         return document.writeln('Vertex not found');
     }
     
-    //changing open and closed to have their indices correspond to the vid's of the vertexObj's in this.vertices
     //edge case, A == B
     if (start.vid == end.vid) {
         document.writeln("start == end. dist is 0");
         return {"path":[start], "d":0};
     }
-    
+
     var open = [];
     open.push(start);
     var openF = [];  //distances of elements in open. contains (the known distance from start to that node, plus the estimated distance from that node to end node) of vertex with position i within open at position i within openF
@@ -327,24 +258,19 @@ Graph.prototype.astar = function(start, end) {
             estDistAtoB[i] = Infinity;
         }
     }
-    
     //but assign 0 as the shortest distance to startVertex
     shortestDistsFromA[start.vid] = 0;
     
     var V;
     //populate distsToB with the h values for each vertex
-    //NOTE: given our program will be operating on many vertex graphs, it might be cheaper to calculate hx as we go, instead of all at once in the beginning.
     for (var i = 0; i < this.vertices.length; i++) {
         if (this.vertices[i])  {//if the vertex exists
             V = this.vertices[i];
             distsToB[i] = Math.sqrt(Math.pow(V.lat - end.lat, 2) + Math.pow(V.long - end.long, 2));
         }
     }
-    
-    
-    //is THIS the problem. should be a-t-c-f dist from start to end, not 0 (dist from start to start = 0, and dist from start to end = diststarttoend)
-    estDistAtoB[start.vid] = distsToB[start.vid];
 
+    estDistAtoB[start.vid] = distsToB[start.vid];
     var parents = [];  //ith entry contains vid of parent of vertex whose vid == i
     var gx;  //"g(x)" = distance from startVertex to a given vertex
     var hx; //"h(x)" = estimated distance from given vertex to B
@@ -356,20 +282,16 @@ Graph.prototype.astar = function(start, end) {
     var neighborVid;
     var distToNeighbor;
     var visitCounter = 0; //to compare performance with Dijkstra
-    
     //open and openF are designed to always maintain the same indices. index i of vertex V in open has its shortest distance recorded at index i of openF
-    
     while (open.length) {
         //set vertexObj to the vertex in open with shortest known distance from A
         openF = [];
         for(var i = 0; i < open.length; i++) {
             openF[i] = estDistAtoB[open[i].vid];  //populate shortest distances of open list
-            
         }
         
         //assign vertexObj to the vertex in open with shortest distance From A
         minDistOfOpenF = Math.min.apply(null, openF);  //smallest distance in openD
-        
         Vid = estDistAtoB.indexOf(minDistOfOpenF);  //vertex that has this minDist has position Vid in shortestDistsFromA...
         //BUT have to make sure the vertex with this min distance hasnt yet been visited, bc it could could be tied for the min distance with a vertex that has already been visited, and which also occurs earlier in the list, thus always being chosen even though it should never have been chosen again
         while (~indexOfVertex(Vid, closed)) {  //keep calculating a new Vid until arrive at one that has not yet been visited (while its in closed)
@@ -378,39 +300,32 @@ Graph.prototype.astar = function(start, end) {
         visitCounter++;
         //...and therefore the same position within this.vertices
         vertexObj = this.vertices[Vid];
-        
-        closed.push(vertexObj);  //???does it matter if close it here instead of after calculating fx for each of its neighbors???
+        closed.push(vertexObj);
         open.splice(indexOfVertex(vertexObj.vid, open), 1); //remove from open
         //remove it from openF as well
         openF.splice(indexOfVertex(vertexObj.vid, open), 1);
-        
-        //ISNT VISITING ITS LAST NEIGHBOR
+
         for(var i = 0; i < this.edges[vertexObj.vid].length; i++) {
             //if neighbor is unvisited
             neighborVid = this.edges[vertexObj.vid][i].vid;
             neighborV = this.vertices[neighborVid];
-            
+
             distToNeighbor = this.edges[vertexObj.vid][i].d;
             if (!~indexOfVertex(neighborVid,closed)) {  //if neighbor has not yet been visited
-                
+
                 //make sure its not already in open before adding it
-                //??i have the feeling i can avoid performing this check. eh, maybe not??
                 if (!~indexOfVertex(neighborVid,open)) {
                     open.push(neighborV);
                 }
                 
-                
+
                 gx = shortestDistsFromA[vertexObj.vid] + distToNeighbor;
-                //??check if both gx and fx are less than current values??
                 //if gx is less than current shortest dist, then update gx and parent
                 if (gx < shortestDistsFromA[neighborVid]) {
                     //update shortest distance from A to that neighbor
                     shortestDistsFromA[neighborVid] = gx;
-                    
                     //and update the neighbor's parent
                     parents[neighborVid] = vertexObj.vid;
-                    
-                    //??if gx didnt decrease, then fx wont increase either, bc hx is constant. so only need to update fx from within this if-block?? and dont need to check again if it decreased, just go ahead and update it??
                     hx = distsToB[neighborVid];
                     fx = gx + hx;
                     estDistAtoB[neighborVid] = fx;
@@ -421,21 +336,15 @@ Graph.prototype.astar = function(start, end) {
                     //obtain shortest path from A to B
                     vertexObj = end;
                     path = [vertexObj];
-                    
                     while (parents[vertexObj.vid] != start.vid) {
-                        
-                        
                         parent = this.vertices[parents[vertexObj.vid]];
                         path.unshift(parent); //add parent vertexObj to head of path
                         vertexObj = this.vertices[parents[vertexObj.vid]];
                     }
-                    
                     //dont forget to add A at the end
                     parent = this.vertices[parents[vertexObj.vid]];
                     path.unshift(parent);
-                    
                     //actually, need to return both the path itself as well as its length, so return an object
-                    
                     return {"path":path, "d":gx};
                 }
             }
@@ -444,7 +353,61 @@ Graph.prototype.astar = function(start, end) {
 }
 
 
+//generate a midline thru the point X/Yth of the way to B from A
+Graph.prototype.plotRandomPoint = function(A, B) {
+    var rise = B.lat - A.lat;  //sign doesnt matter, because will take its absolute value later
+    var run = B.long - A.long;
+    //remember to handle edge case where A and B have same longitude (avoid divide by 0)
+    var origPos = rise/run > 0; //has value of true if slope is positive
+    var Y = getRandomInteger(2,7); //denominator of midpoint can be from 2 to 7
+    var X = getRandomInteger(1,Y-1); //numerator of midpoint can be from 1 to Y-1
+    //plot midPoint X/Yth of the way to B from A
+    var midPoint = {"lat":A.lat + (rise * X / Y), "long":A.long + (run * X / Y)};
+    var invRise = Math.abs(run);  //origPos will handle whether to add or subtract it
+    var invRun = Math.abs(rise);
+    var Z = getRandomInteger(0,1); //which direction along midline from midpoint that the node will be fitted. if 0, then plot to the right. if 1, then plot to the left.
+    var W = getRandomInteger(2,5); //cut the left or right half (based on Z) into 2 to 5 pieces
+    var U = getRandomInteger(1,W-1); //which of those pieces to plot the random point at
+    if (origPos) {
+        if (Z == 0) { //then plot point to right of midpoint
+            return {"lat":midPoint.lat - ((invRise / 2) * (U / W)), "long":midPoint.long + ((invRun / 2) * (U / W))};
+        }
+        else { //plot it to left
+            return {"lat":midPoint.lat + ((invRise/ 2)  * (U / W)), "long":midPoint.long - ((invRun / 2) * (U / W))};
+        }
+        
+    } else {
+        if (Z == 0) { //then plot point to right of midpoint
+            return {"lat":midPoint.lat + ((invRise/ 2)  * (U / W)), "long":midPoint.long + ((invRun / 2) * (U / W))};
+        }
+        
+        else { //plot it to left
+            return {"lat":midPoint.lat - ((invRise/ 2)  * (U / W)), "long":midPoint.long - ((invRun / 2) * (U / W))};
+        }
+    }
+}
 
+//generate random path from start to end thru node. keeps generating random point until can draw a short enough path thru it
+Graph.prototype.generateRandomPath = function(start, end, lap) {
+    var point, points, node, path;
+    path = [];
+    var i = 0;
+    while (path.length == 0 && i < 100) { //until short enough, keep trying to plot a point and form shortest path thru it
+        //document.writeln("wasnt short enough. trying again");
+        point = this.plotRandomPoint(start, end); //point is {lat, long} object
+        points = [point];
+        document.writeln(JSON.stringify(points));
+        nodes = this.fitNodesToMidline(points);
+        path = this.pathThruNode(start, end, nodes[0], lap); //nodes will always contain a single element
+        i++;
+    }
+    if (i==100) {
+        document.writeln("failed to form short enough path");
+        return [];
+    }
+    return path;
+    
+}
 
 
 //populate the midline between A and B with
@@ -461,15 +424,15 @@ Graph.prototype.populateMidline = function(A, B) {
     var points = [];
     //left and right are taken from the perspective of A facing B
     //each initialized as midpoint and incremented X times each in opposite directions
-    
     var mpR = {"lat":midPoint.lat, "long":midPoint.long};  //point within right half of solution space
     var mpL = {"lat":midPoint.lat, "long":midPoint.long};  //point within left half of solution space
     //initialize points with the midpoint itself
     points.push(midPoint);
     var X = 5; //the number of points to gather on each side of the midpoint. results in a midline of 2X + 1 vertices
-    if (origPos) {
+    
+    if (origPos) { //line from A to B had positive slope, so midline has negative slope
         i = 0;
-        while (i < X) {
+        while (i < X) { //plot points to the right of midline
             mpR.long = mpR.long + ((invRun / 2) / X);
             mpR.lat = mpR.lat - ((invRise / 2) / X);
             var p = {"lat":mpR.lat, "long":mpR.long};
@@ -477,27 +440,24 @@ Graph.prototype.populateMidline = function(A, B) {
             i++;
         }
         i = 0;
-        while (i < X) {
+        while (i < X) { //plot points to the left of midline
             mpL.long = mpL.long - ((invRun / 2) / X);
             mpL.lat = mpL.lat + ((invRise/ 2) / X);
             var p = {"lat":mpL.lat, "long":mpL.long};
-            
             points.unshift(p);
             i++;
         }
-        
-    } else {
+    } else { //line from A to B had negative slope, so midline has positive slope
         i = 0;
-        while (i < X) {
+        while (i < X) { //plot points to the right of midline
             mpR.long = mpR.long + ((invRun / 2) / X);
             mpR.lat = mpR.lat + ((invRise/ 2) / X);
             var p = {"lat":mpR.lat, "long":mpR.long};
             points.push(p);
             i++;
         }
-        
         i = 0;
-        while (i < X) {
+        while (i < X) { //plot points to the left of midline
             mpL.long = mpL.long - ((invRun / 2) / X);
             mpL.lat = mpL.lat - ((invRise/ 2) / X);
             var p = {"lat":mpL.lat, "long":mpL.long};
@@ -507,22 +467,16 @@ Graph.prototype.populateMidline = function(A, B) {
     }
     
     return points;
-    
-    
- 
 }
-    
-    
+
+
 Graph.prototype.fitNodesToMidline = function(points) { //fits every point in points to a vertexObj
-    //naive best-fitter algorithm:
-    //bc every vertex in vertices calculates a diff with every single point, resulting in ((2X + 1) * vertices.length * numOfInstructionsPerDiff) instructions
+    //bc every vertex in vertices calculates a diff with every single point, resulting in ((2X + 1) * vertices.length * numOfInstructionsPerDiff) instructions, where X is the number of points plotted on each side of the midpoint
     smallestDiffs = [];  //consists of 11 diffObj's (if X == 5) at positions 0 thru 10, corresponding to points 0 thru 10 (points 0 thru 4 are Left half, 5 is midPoint, and 6-10 are righthalf)
     //these objects are of the form {vid:X,diff:Y} to denote which vertex so far has the smallest difference, and what that difference is.
     //jth entry corresponds to jth point within points
     //initialize smallestDiff
-    //for (var i = 0; i < 2 * X + 1; i++) {
     for (var i = 0; i < points.length; i++) {
-        //??which vid to initialize it to??
         var value = {"vid":0, "diff": -1};
         smallestDiffs[i] = value;
     }
@@ -532,7 +486,6 @@ Graph.prototype.fitNodesToMidline = function(points) { //fits every point in poi
     var diffObj;
     for (var i = 0; i < this.vertices.length; i++) {
         for (var j = 0; j < points.length; j++) {
-        //for (var j = 0; j < 2 * X + 1; j++) {
             V = this.vertices[i];
             if (V) {
                 // should be sum of absolute values of differences
@@ -552,14 +505,11 @@ Graph.prototype.fitNodesToMidline = function(points) { //fits every point in poi
                 }
             }
         }
-        
-        
     }
     
     //once you fit a vertex to a point, you must remove that vertex from future consideration
     //at this point, smallestDiffs has diffObj with vid of the vertex best fit to that point
     bestFitNodes = [];  //ith entry contains the vertex best fit to point i of points
-    //for (var i = 0; i < 2 * X + 1; i++) {
     for (var i = 0; i < points.length; i++) {
         V = this.vertices[smallestDiffs[i].vid];
         if (!(~indexOfVertex(V.vid, bestFitNodes)))     //in case same vertex best-fits to same point
@@ -567,28 +517,18 @@ Graph.prototype.fitNodesToMidline = function(points) { //fits every point in poi
     }
     
     return bestFitNodes;
-    
-    
-    
-    
-    
-    
 }
 
 
 //lap is longestAllowedPath
 Graph.prototype.generateInitialPopulation = function(A, B, bestFitNodes, lap) {
-    //REMEMBER to implement feature where they can input xPercent as an absolute number of miles, as well
+
     var pathPopulation = [] //holds the paths thru each of the midNodes (it is a list of lists)
     for(var i = 0; i < bestFitNodes.length; i++) {
         var midNode = bestFitNodes[i];
-        //var pathD1 = this.dijkstra(A, midNode);
         var pathD1 = this.astar(A, midNode);
-
-        //var pathD2 = this.dijkstra(midNode, B);
         var pathD2 = this.astar(midNode, B);
 
-    
         //check if path has repeated nodes (not including midNode, of course)
         //and
         //check if this individual is short enough to be member of initial population
@@ -599,14 +539,31 @@ Graph.prototype.generateInitialPopulation = function(A, B, bestFitNodes, lap) {
             pathPopulation.push(pathThruMidNode);
         }
     }
-    
-    //document.writeln("path population is:");
-    //for(var i = 0; i < pathPopulation.length; i++) {
-    //    document.writeln(this.pathToString(pathPopulation[i]));
-    //}
-    document.writeln("longest allowed path is : " + longestAllowedPath);
+    /*
+    document.writeln("path population is:");
+    for(var i = 0; i < pathPopulation.length; i++) {
+        document.writeln(this.pathToString(pathPopulation[i]));
+    }
+     */
 
-    return {pop: pathPopulation, lap: longestAllowedPath}
+    return pathPopulation;
+}
+
+
+Graph.prototype.pathThruNode = function(A, B, node, lap) {
+    var pathD1 = this.astar(A, node);
+    var pathD2 = this.astar(node, B);
+    var path = [];
+    //check if this individual is short enough to be member of initial population
+    if (pathD1.d + pathD2.d < lap) {
+        //remove midNode (element 0) from pathD2 so that upcoming list concatenation does not contain it twice
+        pathD2.path.shift();
+        var path = (pathD1.path).concat(pathD2.path); //shortest path from A to B that crosses through midNode
+        return path;
+    }
+    else {
+        return path; //will return empty list. check if its empty in calling function to determine if was able to construct short enough path thru it without backtracking
+    }
 }
 
 
@@ -616,14 +573,8 @@ Graph.prototype.elevGainOf = function(path) {  //path is of vertexObj’s
         elevDiff = path[i+1].elev - path[i].elev;
         if (elevDiff > 0) {
             gain = gain + elevDiff;
-            //document.writeln("gain from " + path[i].label + " to " + path[i+1].label + " is " + elevDiff);
         }
-        //else
-            //document.writeln("gain from " + path[i].label + " to " + path[i+1].label + " is " + 0);
-
     }
-    document.writeln("");
-
     return gain;
 }
 
@@ -653,22 +604,21 @@ Graph.prototype.replicate = function(sortedElevationGains) {
 
     var parentList = []; //the parents to undergo crossover, who are more likely to get added the higher their rank is
     //spin roulette wheel a number of times equal to the number of paths in the population
-    //NOTE: change it later to spin a greater number of times
     for (var i = 0; i < sortedElevationGains.length; i++) {
         rank = rankSpace[getRandomInteger(0, rankSpace.length - 1)];
         //add that path to parentList
         parentList.push(sortedElevationGains[rank - 1]); //(path of rank i is located at index (i-1)
     }
     
-    //document.writeln("in replicate: parentList is:");
     for (var i = 0; i < parentList.length; i++) {
-        //document.writeln(this.pathToString(parentList[i].path));
+        document.writeln(this.pathToString(parentList[i].path));
     }
+     
     return parentList; //list of (path, gain) ordered pairs not in sorted order
 }
 
 
-//NOTE: handle the case where lots of overlap because ranks happened to be calculated to only contain 2 or 3 different paths. create mutation operator??
+
 //list of (path, gain) pairs -> list of (path, path) pairs
 Graph.prototype.formPairs = function(parentList) {
     var pairs = [];  //list of (parent1, parent2) “tuples”    //because of odd numbers, these objects will not be entirely unique; at least one of them will have a field in common with another of them
@@ -696,8 +646,9 @@ Graph.prototype.formPairs = function(parentList) {
         }
      }
     
-     //document.writeln("in formPairs: pairs is:");
      /*
+     document.writeln("in formPairs: pairs is:");
+    
      for (var i = 0; i < pairs.length; i++) {
          document.writeln(this.pathToString(pairs[i].p1));
          document.writeln(this.pathToString(pairs[i].p2));
@@ -719,12 +670,6 @@ Graph.prototype.firstDiff = function(p,q) {
         else
             break;
     }
-    //document.writeln("first diff between paths:");
-    //document.writeln(this.pathToString(p));
-    //document.writeln("and");
-    //document.writeln(this.pathToString(q));
-    //document.writeln("is at index " + i);
-    //document.writeln("");
 
     return i;
 }
@@ -742,21 +687,10 @@ Graph.prototype.lastDiffs = function(p,q) {
         else
             break;
     }
-    
     var pointsOfld = {ldP:i,ldQ:j};
-    //document.writeln("last diff between paths is at index " + pointsOfld.ldP + " in");
-    //document.writeln(this.pathToString(p));
-    //document.writeln("and at " + pointsOfld.ldQ + " in");
-    //document.writeln(this.pathToString(q));
-    //document.writeln("");
 
     return pointsOfld;
 }
-
-
-
-
-
 
 
 //within the bounds at which the paths differ (their "infixes", as opposed to common prefixes or suffixes), obtain positions on p and q that we will later connect together to form a new child path
@@ -766,15 +700,13 @@ Graph.prototype.getCrossoverPoints = function(path1, path2, A, B) {
 
     //if the paths are identical or if we fail to a form crossover point between them (either due to t being too far away from B, or s_to_t containing nodes in common with either A_to_s or t_to_B), the outcome is the same (just generate themselves as children). here, we know its due to being identical
     if (fd == path1.length && (lds.ldP == -1 || lds.ldQ == -1)) { //if paths are identical
-        document.writeln("paths are identical. wont try to perform crossover");
-        document.writeln("");
-
+        //document.writeln("paths are identical. wont try to perform crossover");
         return {"sPos":-1, "tPos":-1};
     }
 
     //choose s on infix of path1
-    //document.writeln("infix of path1 is " + this.pathToString(path1.slice(fd, lds.ldP + 1)));
-    //document.writeln("infix of path2 is " + this.pathToString(path2.slice(fd, lds.ldQ + 1)));
+    document.writeln("infix of path1 is " + this.pathToString(path1.slice(fd, lds.ldP + 1)));
+    document.writeln("infix of path2 is " + this.pathToString(path2.slice(fd, lds.ldQ + 1)));
     
     var sPos = getRandomInteger(fd, lds.ldP);   //crossover point on path1
     var s = path1[sPos];    //crossover node on p
@@ -786,14 +718,12 @@ Graph.prototype.getCrossoverPoints = function(path1, path2, A, B) {
     //ensure distance from t to B is less than distance from s to B
     var x = Math.sqrt(Math.abs(B.lat - t.lat) + Math.abs(B.long - t.long));
     var y = Math.sqrt(Math.abs(B.lat - s.lat) + Math.abs(B.long - s.long));
-    //document.writeln("dist of " + s.label + " from " + B.label + " is " + y);
-    //document.writeln("dist of " + t.label + " from " + B.label + " is " + x);
     
+    //arbitrarily decide to try up to 7 times to form valid crossover points
     while (x > y && k < 7) {    //while t is further from B than s is from B
         //try again with new crossover points
         k++;
-        document.writeln("t is in wrong direction; generating crossover points for the " + k + "th time");
-        
+        //document.writeln("t is in wrong direction; generating crossover points for the " + k + "th time");
         //recalculate s and t
         sPos = getRandomInteger(fd, lds.ldP);
         s = path1[sPos];
@@ -801,37 +731,24 @@ Graph.prototype.getCrossoverPoints = function(path1, path2, A, B) {
         t = path2[tPos];
         x = Math.sqrt(Math.abs(B.lat - t.lat) + Math.abs(B.long - t.long));
         y = Math.sqrt(Math.abs(B.lat - s.lat) + Math.abs(B.long - s.long));
-        //document.writeln("dist of " + s.label + " from " + B.label + " is " + y);
-        //document.writeln("dist of " + t.label + " from " + B.label + " is " + x);
     }
     
     if (x > y && k == 7) {   //if we fail to form crossover points between path1 and path2
         return {"sPos":-1, "tPos":-1};
-        document.writeln("");
-
     }
-    document.writeln("");
 
     return {"sPos":sPos, "tPos":tPos};
-    
-    
 }
-
-
 
 
 Graph.prototype.generateChild = function(path1, path2, lap, A, B) {
     var i, crosspoints, s_to_t, path_s_to_t, dist_s_to_t, path_A_to_s, dist_A_to_s, path_t_to_B, dist_t_to_B, totalDist, cond;
 
-    for(i = 0; i < 7; i++) { //NOTE: change this to higher value later. for now, try up to 3 times to form a short enough child
+    for(i = 0; i < 7; i++) { //arbitrarily try up to 7 times to generate a short enough child
         crosspoints = this.getCrossoverPoints(path1, path2, A, B);
         
         if (crosspoints.sPos == -1 && crosspoints.tPos == -1) {
-            document.writeln("t was never close enough to B, or they were identical. failed to cross over");
-            document.writeln("");
-            document.writeln("");
-            document.writeln("");
-
+            //document.writeln("t was never close enough to B, or they were identical. failed to cross over");
             return path1;  //could not form crossover at all, so return path1 as child
         }
         
@@ -843,18 +760,11 @@ Graph.prototype.generateChild = function(path1, path2, lap, A, B) {
         path_t_to_B = path2.slice(crosspoints.tPos); //list of nodes from t to B
         dist_t_to_B = this.pathLength(path_t_to_B);
 
-        
         //calculate shortest path from s to t.
-        
         var s = path_A_to_s[path_A_to_s.length-1];
         var t = path_t_to_B[0];
-        
-        if ((path_A_to_s[path_A_to_s.length-1].vid) == (path_t_to_B[0].vid))
-            document.writeln("successfully passed s == t edgecase");
 
-        //s_to_t = this.dijkstra(path1[crosspoints.sPos], path2[crosspoints.tPos]);
         s_to_t = this.astar(path1[crosspoints.sPos], path2[crosspoints.tPos]);
-
         path_s_to_t = s_to_t.path;
         dist_s_to_t = s_to_t.d;
         
@@ -865,18 +775,14 @@ Graph.prototype.generateChild = function(path1, path2, lap, A, B) {
         }
         
         totalDist = dist_A_to_s + dist_s_to_t + dist_t_to_B;
+        CURRENT_BEST_PL = totalDist;
         if (totalDist <= lap) { //if the child is shorter than the longest allowed path
             //remove s duplicate
-            document.writeln("total dist is " + totalDist + ", so child is short enough");
-
             path_A_to_s = path_A_to_s.slice(0,path_A_to_s.length - 1);
             //remove t duplicate
             path_t_to_B = path_t_to_B.slice(1);
-            
-            //document.writeln("crossed over at s = " + path1[crosspoints.sPos].label + " and t = " + path2[crosspoints.tPos].label);
-            document.writeln("");
-            document.writeln("");
-            document.writeln("");
+            document.writeln("crossed over at s = " + path1[crosspoints.sPos].label + " and t = " + path2[crosspoints.tPos].label);
+    
 
             return path_A_to_s.concat(path_s_to_t, path_t_to_B);
         }
@@ -906,34 +812,32 @@ Graph.prototype.crossover = function(p, q, lap, start, end) {
     var child2 = this.generateChild(q,p,lap,start,end);
     children.push(child2);
     document.writeln("");
-    //document.writeln("parent 1: " + this.pathToString(p));
-    //document.writeln("parent 2: " + this.pathToString(q));
+    document.writeln("parent 1: " + this.pathToString(p));
+    document.writeln("parent 2: " + this.pathToString(q));
     document.writeln("");
-    //document.writeln("child  1: " + this.pathToString(child1));
-    //document.writeln("child  2: " + this.pathToString(child2));
+    document.writeln("child  1: " + this.pathToString(child1));
+    document.writeln("child  2: " + this.pathToString(child2));
     
     return children;
 }
 
-
-Graph.prototype.evolvePopulation = function(population, longestAllowedPath, start, end) {
+//maxOrMin == true, then maximize elevation gain. maxOrMin == false, then minimize elevation gain
+Graph.prototype.evolvePopulation = function(population, longestAllowedPath, start, end, maxOrMin) {
     var parentList, pairs, parentPop, childPop, parentGains,childGains, parentAndChildGains, localOptimum, bestG;
-
     parentPop = population;     //parentPop is list of paths
-
     //get gains of each path in parentPop
     parentGains = this.getElevGains(parentPop);   //parentGains is list of (path, gain) ordered pairs
-
-    parentGains = parentGains.sort(function(P, Q) { return P.g - Q.g;
+    if (maxOrMin) { //maximize elevation gain
+        parentGains = parentGains.sort(function(P, Q) { return P.g - Q.g;
                                                    }); //index i holds path with rank (i+1) (ranks are 1-based, index is 0-based)
-    document.writeln("after sorting, parentGains is: ");
-    for (var i = 0; i < parentGains.length; i++) {
-        //document.writeln(this.pathToString(parentGains[i].path), parentGains[i].g);
     }
-//from this point on, parentGains is always sorted by elevation gain
+    else { //minimize elevation gain
+        parentGains = parentGains.sort(function(P, Q) { return Q.g - P.g;
+                                       }); //index i holds path with rank (i+1) (ranks are 1-based, index is 0-based)
+    }
     
-    
-    //NOTE: change this to higher value later. for now, arbitrarily decide to do 7 rounds
+    //from this point on, parentGains is always sorted by elevation gain
+    //arbitrarily decide to do 20 rounds
     for (var i = 0; i < 20; i++) {
         //replicate each parent proportional to its rank
         parentList = this.replicate(parentGains);    //list of paths that will generate next set of children
@@ -944,302 +848,317 @@ Graph.prototype.evolvePopulation = function(population, longestAllowedPath, star
             document.writeln("");
             document.writeln("");
             document.writeln("crossover of round i=" + i + ", iter j=" + j);
-
+            
             children = this.crossover(pairs[j].p1, pairs[j].p2, longestAllowedPath, start, end);   //each parent will have 2 children
             childPop = childPop.concat(children);  //which each get added to the child population
-        }
-        
-        document.writeln("childPop is:");
-        for (var xx = 0; xx < childPop.length; xx++) {
-            //document.writeln(this.pathToString(childPop[xx]));
         }
         
         childGains = this.getElevGains(childPop);
         //create list of gains of parents and children combined
         parentAndChildGains = parentGains.concat(childGains);
-        
         //no longer sorted by gain, so sort it again
-        parentAndChildGains = parentAndChildGains.sort(function(P, Q) { //sort paths by gain
+        if (maxOrMin) {
+            parentAndChildGains = parentAndChildGains.sort(function(P, Q) {
                                                return P.g - Q.g;
                                                });
-    
+        }
+        else { //minimize elevation gain
+            parentAndChildGains = parentAndChildGains.sort(function(P, Q) {
+                                               return Q.g - P.g;
+                                               });
+        }
+        
         //“kill off the bottom 50th percentile” -> keep the top half of the list only and assign it as the new parentPop (length of total is always even because doubled parentPop to create it. so don’t need to cover the odd length case.
         //assign this upper half as the new parentGains for the new parentPop (what will serve as parentPop in the next round)
         parentGains = []; //clear parentGains
-        
         //next generation of parents
         parentGains = parentAndChildGains.slice(parentAndChildGains.length / 2);  //new parentGains contains paths derived from both previous parentGains and new childGains
-        
-        document.writeln("");
-        document.writeln("");
-        document.writeln("");
-
+        var optimum = parentGains[parentGains.length - 1];
         localOptimum = parentGains[parentGains.length - 1].path;
         bestG = parentGains[parentGains.length - 1].g;
-        CURRENT_BEST = bestG;
-        //document.writeln("round " + i + " produced a local optimum of:" + this.pathToString(localOptimum));
-        document.writeln("with a gain of " + bestG);
-        CURRENT_BEST_PL = this.pathLength(localOptimum);
-        document.writeln("and a pathlength of " + this.pathLength(localOptimum));
-        document.writeln("");
-        document.writeln("");
-        document.writeln("");
-        
+
+        document.writeln("round " + i + " produced a local of optimum of " + bestG);
         //move to next round
+        CURRENT_BEST = bestG;
     }
     
-    return localOptimum;
+    return optimum;
+    
+}
+
+
+function evolver(vertices, edges, start, end, maxOrMin, xPercent) {
+    var graphx = new Graph();
+    graphx.edges = edges;
+    graphx.vertices = vertices;
+    
+    var points = graphx.populateMidline(start,end);
+    var bfn = graphx.fitNodesToMidline(points);
+    var shortestPathDist = graphx.astar(start,end);
+    var shortestDist = shortestPathDist.d;
+    var longestAllowedPath = shortestDist * (xPercent / 100);
+    var pop = graphx.generateInitialPopulation(start,end,bfn, longestAllowedPath);
+
+    var o = graphx.evolvePopulation(pop, longestAllowedPath, start, end, maxOrMin);
+    SHORTEST_PATH_EL = graphx.elevGainOf(shortestPathDist.path);
+    document.writeln("compared to gain of shortest path, which is " + graphx.elevGainOf(shortestPathDist.path));
+    document.writeln("and has a path of " + graphx.pathToString(graphx.astar(start,end).path));
+    document.writeln("and ");
+    var rpath = graphx.generateRandomPath(start,end,longestAllowedPath);
+    document.writeln("compared to gain of random path, which is " + graphx.elevGainOf(rpath));
+    document.writeln("and has a path of " + graphx.pathToString(rpath));
+    
     
 }
 
 
 
 
+
+
+
+
+
+
+
+
+
+
+Graph.prototype.traverseBFS = function(startVertex) {
+    if(!this.vertices[startVertex.vid]) {
+        return document.writeln('Vertex not found');
+    }
+    var queue = [];
+    var visitSequence = "";
+    var visitList = [];
+    queue.push(startVertex);
+    visitList.push(startVertex);
+    visitSequence = visitSequence + startVertex.label + "->";
+    var visNum = 1;
+    var visited = [];  //a vertex with vid == X occupies the Xth position of visited if it has been visited (the Xth position is undefined otherwise)
+    visited[startVertex.vid] = true;  //initialize with startVertex
+    //visited DOES NOT hold the vertex itself
     
+    while(queue.length) {
+        var vertexObj = queue.shift(); //get head of queue
+        //fn(vertexObj);
+        var edgesOfV = this.edges[vertexObj.vid];
+        
+        for(var i = 0; i < edgesOfV.length; i++) {  //for each neighbor of <vertex>
+            //if(!visited[this.edges[vertexObj.vid][i].vid]) {  //if the neighbor hasn't been visited
+            if(!visited[edgesOfV[i].vid]) {  //if the neighbor hasn't been visited
 
-
+                //check if vid (of the ith object in vertexObj's list of edges) is in visited
+                visited[edgesOfV[i].vid] = true;
+                var neighbor = this.vertices[edgesOfV[i].vid];
+                //visited[this.edges[vertexObj.vid][i].vid] = true;  //then visit it
+                visitSequence = visitSequence + neighbor.label + "->";
+                visNum++;
+                queue.push(neighbor);  //and put it in line of vertices waiting to do their own bfs
+                visitList.push(neighbor);
+            }
+        }
+    }
+    var v = visitSequence.slice(0,visitSequence.length-2);
+    document.writeln(v);
+    document.writeln("num visited is " +  visNum);
+    return visitList;
     
-    
-// var num_failures = 0;
-// //kept the for loop not visually indented to be easily removed.
-// for(i = 0; i < 10; i++){
-// var graph = new Graph();
+}
 
-// var e = new vertexObj(1, 3, 10, Math.floor((Math.random() * 10)) + 1, "e");
-// graph.addVertexObj(e);
 
-// var d = new vertexObj(2, 2, 17, Math.floor((Math.random() * 10)) + 1, "d");
-// graph.addVertexObj(d);
+//can reach endVertex from startVertex
+Graph.prototype.canReach = function(startVertex, endVertex) {
+    var vl = this.traverseBFS(startVertex); //visited list
+    if (!~indexOfVertex(endVertex.vid, vl)) //if returns -1 (if endVertex not in visited list)
+        return false;
+    return true;
+}
 
-// var A = new vertexObj(3, 4, 23, Math.floor((Math.random() * 10)) + 1, "A");
-// graph.addVertexObj(A);
 
-// var f = new vertexObj(4, 5, 5, Math.floor((Math.random() * 10)) + 1, "f");
-// graph.addVertexObj(f);
 
-// var h = new vertexObj(5, 9, 18, Math.floor((Math.random() * 10)) + 1, "h");
-// graph.addVertexObj(h);
 
-// var g = new vertexObj(6, 9, 8, Math.floor((Math.random() * 10)) + 1, "g");
-// graph.addVertexObj(g);
 
-// var T = new vertexObj(7, 14, 11, Math.floor((Math.random() * 10)) + 1, "T");
-// graph.addVertexObj(T);
+var graph = new Graph();
 
-// var u = new vertexObj(8, 12, 4, Math.floor((Math.random() * 10)) + 1, "u");
-// graph.addVertexObj(u);
+var e = new vertexObj(1, 3, 10, 4, "e");
+graph.addVertexObj(e);
 
-// var W = new vertexObj(9, 13, 25, Math.floor((Math.random() * 10)) + 1, "W");
-// graph.addVertexObj(W);
+var d = new vertexObj(2, 2, 17, 2, "d");
+graph.addVertexObj(d);
 
-// var l = new vertexObj(10, 15, 28, Math.floor((Math.random() * 10)) + 1, "l");
-// graph.addVertexObj(l);
+var A = new vertexObj(3, 4, 23, 0, "A");
+graph.addVertexObj(A);
 
-// var m = new vertexObj(11, 17, 30, Math.floor((Math.random() * 10)) + 1, "m");
-// graph.addVertexObj(m);
+var f = new vertexObj(4, 5, 5, 4, "f");
+graph.addVertexObj(f);
 
-// var n = new vertexObj(12, 17, 27, Math.floor((Math.random() * 10)) + 1, "n");
-// graph.addVertexObj(n);
+var h = new vertexObj(5, 9, 18, 4, "h");
+graph.addVertexObj(h);
 
-// var U = new vertexObj(13, 16, 25, Math.floor((Math.random() * 10)) + 1, "U");
-// graph.addVertexObj(U);
+var g = new vertexObj(6, 9, 8, 3, "g");
+graph.addVertexObj(g);
 
-// var r = new vertexObj(14, 16, 19, Math.floor((Math.random() * 10)) + 1, "r");
-// graph.addVertexObj(r);
+var T = new vertexObj(7, 14, 11, 1, "T");
+graph.addVertexObj(T);
 
-// var w = new vertexObj(15, 21, 13, Math.floor((Math.random() * 10)) + 1, "w");
-// graph.addVertexObj(w);
+var u = new vertexObj(8, 12, 4, 3, "u");
+graph.addVertexObj(u);
 
-// var v = new vertexObj(16, 21, 5, Math.floor((Math.random() * 10)) + 1, "v");
-// graph.addVertexObj(v);
+var W = new vertexObj(9, 13, 25, 5, "W");
+graph.addVertexObj(W);
 
-// var y = new vertexObj(17, 19, 1, Math.floor((Math.random() * 10)) + 1, "y");
-// graph.addVertexObj(y);
+var l = new vertexObj(10, 15, 28, 3, "l");
+graph.addVertexObj(l);
 
-// var R = new vertexObj(18, 23, 1, Math.floor((Math.random() * 10)) + 1, "R");
-// graph.addVertexObj(R);
+var m = new vertexObj(11, 17, 30, 6, "m");
+graph.addVertexObj(m);
 
-// var Q = new vertexObj(19, 25, 4, Math.floor((Math.random() * 10)) + 1, "Q");
-// graph.addVertexObj(Q);
+var n = new vertexObj(12, 17, 27, 2, "n");
+graph.addVertexObj(n);
 
-// var D = new vertexObj(20, 22, 34, Math.floor((Math.random() * 10)) + 1, "D");
-// graph.addVertexObj(D);
+var U = new vertexObj(13, 16, 25, 4, "U");
+graph.addVertexObj(U);
 
-// var E = new vertexObj(21, 25, 25, Math.floor((Math.random() * 10)) + 1, "E");
-// graph.addVertexObj(E);
+var r = new vertexObj(14, 16, 19, 2, "r");
+graph.addVertexObj(r);
 
-// var X = new vertexObj(22, 29, 18, Math.floor((Math.random() * 10)) + 1, "X");
-// graph.addVertexObj(X);
+var w = new vertexObj(15, 21, 13, 1, "w");
+graph.addVertexObj(w);
 
-// var F = new vertexObj(23, 29, 31, Math.floor((Math.random() * 10)) + 1, "F");
-// graph.addVertexObj(F);
+var v = new vertexObj(16, 21, 5, 8, "v");
+graph.addVertexObj(v);
 
-// var B = new vertexObj(24, 32, 8, Math.floor((Math.random() * 10)) + 1, "B");
-// graph.addVertexObj(B);
+var y = new vertexObj(17, 19, 1, 16, "y");
+graph.addVertexObj(y);
 
-// var P = new vertexObj(25, 33, 10, Math.floor((Math.random() * 10)) + 1, "P");
-// graph.addVertexObj(P);
+var R = new vertexObj(18, 23, 1, 27, "R");
+graph.addVertexObj(R);
 
-// var M = new vertexObj(26, 33, 12, Math.floor((Math.random() * 10)) + 1, "M");
-// graph.addVertexObj(M);
+var Q = new vertexObj(19, 25, 4, 26, "Q");
+graph.addVertexObj(Q);
 
-// var L = new vertexObj(27, 33, 14, Math.floor((Math.random() * 10)) + 1, "L");
-// graph.addVertexObj(L);
+var D = new vertexObj(20, 22, 34, 10, "D");
+graph.addVertexObj(D);
 
-// var N = new vertexObj(28, 31, 12, Math.floor((Math.random() * 10)) + 1, "N");
-// graph.addVertexObj(N);
+var E = new vertexObj(21, 25, 25, 4, "E");
+graph.addVertexObj(E);
 
-// var K = new vertexObj(29, 31, 14, Math.floor((Math.random() * 10)) + 1, "K");
-// graph.addVertexObj(K);
+var X = new vertexObj(22, 29, 18, 4, "X");
+graph.addVertexObj(X);
 
-// var I = new vertexObj(30, 32, 18, Math.floor((Math.random() * 10)) + 1, "I");
-// graph.addVertexObj(I);
+var F = new vertexObj(23, 29, 31, 10, "F");
+graph.addVertexObj(F);
 
-// var H = new vertexObj(31, 32, 28, Math.floor((Math.random() * 10)) + 1, "H");
-// graph.addVertexObj(H);
+var B = new vertexObj(24, 32, 8, 4, "B");
+graph.addVertexObj(B);
 
-// var G = new vertexObj(32, 35, 30, Math.floor((Math.random() * 10)) + 1, "G");
-// graph.addVertexObj(G);
+var P = new vertexObj(25, 33, 10, 6, "P");
+graph.addVertexObj(P);
 
-// var J = new vertexObj(33, 37, 17, Math.floor((Math.random() * 10)) + 1, "J");
-// graph.addVertexObj(J);
+var M = new vertexObj(26, 33, 12, 9, "M");
+graph.addVertexObj(M);
 
+var L = new vertexObj(27, 33, 14, 6, "L");
+graph.addVertexObj(L);
 
-// graph.addEdge(f, e, 2);
-// graph.addEdge(f, u, 3);
-// graph.addEdge(f, g, 2);
+var N = new vertexObj(28, 31, 12, 9, "N");
+graph.addVertexObj(N);
 
-// graph.addEdge(e, g, 3);
-// graph.addEdge(e, d, 3);
+var K = new vertexObj(29, 31, 14, 7, "K");
+graph.addVertexObj(K);
 
-// graph.addEdge(d, A, 3);
-// graph.addEdge(d, h, 3);
+var I = new vertexObj(30, 32, 18, 10, "I");
+graph.addVertexObj(I);
 
-// graph.addEdge(T, g, 3);
-// graph.addEdge(T, w, 4);
-// graph.addEdge(T, h, 5);
+var H = new vertexObj(31, 32, 28, 13, "H");
+graph.addVertexObj(H);
 
-// graph.addEdge(v, u, 6);
-// graph.addEdge(v, y, 2);
-// graph.addEdge(v, w, 5);
-// graph.addEdge(v, P, 8);
-
-// graph.addEdge(w, u, 7);
-// graph.addEdge(w, r, 4);
-// graph.addEdge(w, N, 6);
-
-// graph.addEdge(r, h, 4);
-// graph.addEdge(r, A, 7);
-// graph.addEdge(r, U, 3);
-
-// graph.addEdge(W, A, 4);
-// graph.addEdge(W, U, 2);
-// graph.addEdge(W, l, 2);
-
-// graph.addEdge(n, U, 1);
-// graph.addEdge(n, l, 1);
-// graph.addEdge(n, m, 1);
-// graph.addEdge(n, E, 4);
-
-// graph.addEdge(l, m, 1);
-
-// graph.addEdge(D, m, 3);
-
-// graph.addEdge(E, m, 5);
-// graph.addEdge(E, D, 5);
-// graph.addEdge(E, X, 4);
-
-// graph.addEdge(F, D, 5);
-// graph.addEdge(F, I, 7);
-// graph.addEdge(F, H, 2);
-// graph.addEdge(F, G, 3);
-
-// graph.addEdge(N, U, 12);
-// graph.addEdge(N, K, 1);
-// graph.addEdge(N, M, 1);
-
-// graph.addEdge(H, G, 2);
-// graph.addEdge(H, I, 5);
-
-// graph.addEdge(J, I, 3);
-// graph.addEdge(J, G, 7);
-// graph.addEdge(J, P, 5);
-
-// graph.addEdge(L, M, 1);
-// graph.addEdge(L, K, 1);
-// graph.addEdge(L, I, 2);
-// graph.addEdge(L, X, 2);
-
-// graph.addEdge(M, P, 1);
-
-// graph.addEdge(K, X, 2);
-
-// graph.addEdge(B, P, 1);
-// graph.addEdge(B, Q, 4);
-// graph.addEdge(B, R, 6);
-
-// graph.addEdge(R, Q, 2);
-// graph.addEdge(R, y, 2);
-
-// graph.addEdge(y, Q, 3);
-
-
-// var start = K;
-// var end = f;
-// //graph.dijkstra(start,end);
-
-// //graph.astar(start,end);
-// var bfn = graph.populateMidline(start,end);
-// //for(var i = 0; i < bfn.length; i++) {
-// //    document.writeln("best fit node " + bfn[i].label);
-// //}
-// var xPercent = 200;
-// //var shortestPathDist = graph.dijkstra(start,end);
-// var shortestPathDist = graph.astar(start,end);
-
-// var shortestDist = shortestPathDist.d;
-// var longestAllowedPath = shortestDist * (xPercent / 100);
-
-// //??why did i design this to also return lap??
-// var poplap = graph.generateInitialPopulation(start,end,bfn,longestAllowedPath);
-// var pop = poplap.pop;
-// var lap = poplap.lap;
-
-// //var gain = graph.elevGainOf(pop[4]);
-// //document.writeln("gain is: " + gain);
-// //var elevGains = graph.getElevGains(pop);
-// //for(var i = 0; i < elevGains.length; i++) {
-// //    document.writeln("elev gain of path: " + graph.pathToString(elevGains[i].path) + " is " + elevGains[i].g);
-// //}
-// //document.writeln("");
-// //var parentGains = elevGains.sort(function(P, Q) { //sort paths by gain
-// //                                               return P.g - Q.g;
-// //                                               });
-// //for(var i = 0; i < parentGains.length; i++) {
-// //    document.writeln("elev gain of path: " + graph.pathToString(parentGains[i].path) + " is " + parentGains[i].g);
-// //}
-// //var parentList = graph.replicate(parentGains);
-// //var pairs = graph.formPairs(parentList);
-// //document.writeln("longest allowed path is : " + lap);
-// //var children = graph.crossover(pathdist.path, pathdist.path, lap, A, B);
-// //document.writeln("last diff between :");
-// //document.writeln("and");
-// //document.writeln("is at index " + x.ldP + " in 1st path and " + x.ldQ + " in 2nd path");
-// //document.writeln("crossover points are " + thepoints.sPos + " and " + thepoints.tPos);
-// //document.writeln("child is: " + graph.pathToString(child));
-
-// var assert = function(condition, message) { 
-//     if (!condition){
-//         throw Error("Assert failed" + (typeof message !== "undefined" ? ": " + message : ""));
-//         num_failures++;
-//     }
-// };
-
-// graph.evolvePopulation(pop, lap, start, end);
-// assert(CURRENT_BEST >= graph.elevGainOf(shortestPathDist.path), "The found path was better performance than shortes path");
-// assert(CURRENT_BEST_PL <= longestAllowedPath);
-// document.writeln("compared to gain of shortest path, which is " + graph.elevGainOf(shortestPathDist.path));
-// //document.writeln("and has a path of " + graph.pathToString(graph.dijkstra(start,end).path));
-// }
-
-// document.writeln('The number of failures were: ' + num_failures);
+var G = new vertexObj(32, 35, 30, 18, "G");
+graph.addVertexObj(G);
+
+var J = new vertexObj(33, 37, 17, 8, "J");
+graph.addVertexObj(J);
+
+
+graph.addEdge(f, e, 2);
+graph.addEdge(f, u, 3);
+graph.addEdge(f, g, 2);
+
+graph.addEdge(e, g, 3);
+graph.addEdge(e, d, 3);
+
+graph.addEdge(d, A, 3);
+graph.addEdge(d, h, 3);
+
+graph.addEdge(T, g, 3);
+graph.addEdge(T, w, 4);
+graph.addEdge(T, h, 5);
+
+graph.addEdge(v, u, 6);
+graph.addEdge(v, y, 2);
+graph.addEdge(v, w, 5);
+graph.addEdge(v, P, 8);
+
+graph.addEdge(w, u, 7);
+graph.addEdge(w, r, 4);
+graph.addEdge(w, N, 6);
+
+graph.addEdge(r, h, 4);
+graph.addEdge(r, A, 7);
+graph.addEdge(r, U, 3);
+
+graph.addEdge(W, A, 4);
+graph.addEdge(W, U, 2);
+graph.addEdge(W, l, 2);
+
+graph.addEdge(n, U, 1);
+graph.addEdge(n, l, 1);
+graph.addEdge(n, m, 1);
+graph.addEdge(n, E, 4);
+
+graph.addEdge(l, m, 1);
+
+graph.addEdge(D, m, 3);
+
+graph.addEdge(E, m, 5);
+graph.addEdge(E, D, 5);
+graph.addEdge(E, X, 4);
+
+graph.addEdge(F, D, 5);
+graph.addEdge(F, I, 7);
+graph.addEdge(F, H, 2);
+graph.addEdge(F, G, 3);
+
+graph.addEdge(N, U, 12);
+graph.addEdge(N, K, 1);
+graph.addEdge(N, M, 1);
+
+graph.addEdge(H, G, 2);
+graph.addEdge(H, I, 5);
+
+graph.addEdge(J, I, 3);
+graph.addEdge(J, G, 7);
+graph.addEdge(J, P, 5);
+
+graph.addEdge(L, M, 1);
+graph.addEdge(L, K, 1);
+graph.addEdge(L, I, 2);
+graph.addEdge(L, X, 2);
+
+graph.addEdge(M, P, 1);
+
+graph.addEdge(K, X, 2);
+
+graph.addEdge(B, P, 1);
+graph.addEdge(B, Q, 4);
+graph.addEdge(B, R, 6);
+
+graph.addEdge(R, Q, 2);
+graph.addEdge(R, y, 2);
+
+graph.addEdge(y, Q, 3);
+
+
+
+evolver(graph.vertices, graph.edges, R, D, true, 200);

@@ -181,50 +181,6 @@ for(i = 0; i < 10; i++){
 
 	graph.addEdge(y, Q, 3);
 
-
-	var start = K;
-	var end = f;
-	//graph.dijkstra(start,end);
-
-	//graph.astar(start,end);
-	var bfn = graph.populateMidline(start,end);
-	//for(var i = 0; i < bfn.length; i++) {
-	//    document.writeln("best fit node " + bfn[i].label);
-	//}
-	var xPercent = 200;
-	//var shortestPathDist = graph.dijkstra(start,end);
-	 shortestPathDist = graph.astar(start,end);
-
-	var shortestDist = shortestPathDist.d;
-	var longestAllowedPath = shortestDist * (xPercent / 100);
-
-	//??why did i design this to also return lap??
-	var poplap = graph.generateInitialPopulation(start,end,bfn,longestAllowedPath);
-	var pop = poplap.pop;
-	var lap = poplap.lap;
-
-	//var gain = graph.elevGainOf(pop[4]);
-	//document.writeln("gain is: " + gain);
-	//var elevGains = graph.getElevGains(pop);
-	//for(var i = 0; i < elevGains.length; i++) {
-	//    document.writeln("elev gain of path: " + graph.pathToString(elevGains[i].path) + " is " + elevGains[i].g);
-	//}
-	//document.writeln("");
-	//var parentGains = elevGains.sort(function(P, Q) { //sort paths by gain
-	//                                               return P.g - Q.g;
-	//                                               });
-	//for(var i = 0; i < parentGains.length; i++) {
-	//    document.writeln("elev gain of path: " + graph.pathToString(parentGains[i].path) + " is " + parentGains[i].g);
-	//}
-	//var parentList = graph.replicate(parentGains);
-	//var pairs = graph.formPairs(parentList);
-	//document.writeln("longest allowed path is : " + lap);
-	//var children = graph.crossover(pathdist.path, pathdist.path, lap, A, B);
-	//document.writeln("last diff between :");
-	//document.writeln("and");
-	//document.writeln("is at index " + x.ldP + " in 1st path and " + x.ldQ + " in 2nd path");
-	//document.writeln("crossover points are " + thepoints.sPos + " and " + thepoints.tPos);
-	//document.writeln("child is: " + graph.pathToString(child));
 	
 	var assert = function(condition, message) { 
     	if (!condition){
@@ -233,10 +189,10 @@ for(i = 0; i < 10; i++){
     	}
 	};
 
-	graph.evolvePopulation(pop, lap, start, end);
-	assert(CURRENT_BEST >= graph.elevGainOf(shortestPathDist.path), "The found path was better performance than shortes path");
+	evolver(graph.vertices, graph.edges, R, D, true, 200);
+	assert(CURRENT_BEST >= SHORTEST_PATH_EL, "The found path was better performance than shortes path");
 	assert(CURRENT_BEST_PL <= longestAllowedPath);
-	document.writeln("compared to gain of shortest path, which is " + graph.elevGainOf(shortestPathDist.path));
+	document.writeln("compared to gain of shortest path, which is " + graphx.elevGainOf(shortestPathDist.path));
 	//document.writeln("and has a path of " + graph.pathToString(graph.dijkstra(start,end).path));
 }
 
