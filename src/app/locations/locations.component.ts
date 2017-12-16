@@ -28,6 +28,16 @@ export class LocationsComponent implements OnInit {
   endVectorSource: any;
   iconStyle: any;
 
+  useCurrentLocation: boolean = false;
+  usersLatitude: number;
+  usersLongitude: number;
+
+  useCurrentLocationClick(){
+    if(this.useCurrentLocation){
+      navigator.geolocation.getCurrentPosition(this.setPosition.bind(this));
+    }
+  }
+
   setPosition(position) {
     if(!position){
       return;
@@ -50,8 +60,12 @@ export class LocationsComponent implements OnInit {
     }));
     
     //Set start location to users location
+    //Also save users location.
+    this.usersLatitude = position.coords.latitude;
+    this.usersLongitude = position.coords.longitude;
     this.startLongitude = position.coords.longitude;
     this.startLatitude = position.coords.latitude;
+    
     var feature = new ol.Feature({
       geometry: new ol.geom.Point(ol.proj.fromLonLat([position.coords.longitude, position.coords.latitude]))
     });
@@ -59,6 +73,7 @@ export class LocationsComponent implements OnInit {
     this.startVectorSource.clear();
     this.startVectorSource.addFeature(feature);
   }
+
   ngOnInit() {
     this.startVectorSource = new ol.source.Vector();
     var startVectorLayer = new ol.layer.Vector({
@@ -120,6 +135,9 @@ export class LocationsComponent implements OnInit {
     });
 
     this.startMap.on('click', function(e) {
+      if(this.useCurrentLocation){
+        this.useCurrentLocation = false;
+      }
       var lonlat = ol.proj.toLonLat(e.coordinate, new ol.proj.Projection({code: 'EPSG:3857'}));
       this.startLongitude = lonlat[0];
       this.startLatitude = lonlat[1];

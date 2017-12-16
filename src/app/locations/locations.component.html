@@ -14,6 +14,9 @@
         </label>
       </div>
     </div>
+    <div class="locationCheckbox">
+        Use Current Location: <input class="inputCheckbox" [(ngModel)]="useCurrentLocation" type="checkbox" (change)="useCurrentLocationClick()">
+    </div>
   </div>
   <div class="rightMapDiv">
     <h4>End Location</h4>
